@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import FeastList.restaurants.Restaurant;
+import FeastList.users.vendors.Vendor;
 
 @RestController
 @RequestMapping(path="/api/v1/menuItem",produces="application/json")
@@ -24,9 +24,9 @@ public class MenuItemController {
 		this.menuService=menuService;
 	}
 	@PostMapping(consumes="application/json")
-	public MenuItem RestaurantMenuItem(@AuthenticationPrincipal Restaurant  restaurant, @RequestBody MenuItem menuItem)
+	public MenuItem RestaurantMenuItem(@AuthenticationPrincipal Vendor vendor, @RequestBody MenuItem menuItem)
 	{
-		return menuService.saveRestaurantMenuItem(restaurant,menuItem);
+		return menuService.saveRestaurantMenuItem(vendor,menuItem);
 		
 	}
 	@GetMapping("/{id}")
@@ -46,13 +46,13 @@ public class MenuItemController {
 		return "i am happy 🤣🤣";
 	}
 	@PutMapping("/{id}")
-	public MenuItem putMenuItem(@AuthenticationPrincipal Restaurant restaurant,@RequestBody MenuItem menuItem,@PathVariable("id") long id ) {
-		return menuService.updateRestaurantMenuItem(restaurant,menuItem,id);
+	public MenuItem putMenuItem(@AuthenticationPrincipal Vendor vendor, @RequestBody MenuItem menuItem, @PathVariable("id") long id ) {
+		return menuService.updateRestaurantMenuItem(vendor,menuItem,id);
 		
 	}
 	@DeleteMapping("/{id}")
-	public void DeleteMenuItem(@AuthenticationPrincipal Restaurant restaurant,@PathVariable("id") long itemId) 
+	public void DeleteMenuItem(@AuthenticationPrincipal Vendor vendor, @PathVariable("id") long itemId)
 	{
-			menuService.deleteRestaurantMenuItem(restaurant,itemId);
+			menuService.deleteRestaurantMenuItem(vendor,itemId);
 	}
 }

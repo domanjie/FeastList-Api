@@ -3,23 +3,22 @@ package FeastList.security.jwt;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+@Component
 public class JwtsTokenServiceImpl implements JwtsTokenService {
-    private final JWSSigner signer;
-    private final JWSVerifier verifier;
 
-    public JwtsTokenServiceImpl(String secrete) throws JOSEException {
-        this.signer=new MACSigner(secrete);
-        this.verifier=new MACVerifier(secrete);
-    }
 
     @Override
-    public  String createToken(Payload payload) throws JOSEException {
+    public  String createToken(Payload payload,String secrete) throws JOSEException {
+
+        JWSSigner  signer=new MACSigner(secrete);
 
         JWSObject jwsObject=new JWSObject(new JWSHeader(JWSAlgorithm.HS256),payload);
 
@@ -29,7 +28,9 @@ public class JwtsTokenServiceImpl implements JwtsTokenService {
     }
 
     @Override
-    public Optional<Map<String, Object>> verifyToken(String token) throws ParseException, JOSEException {
+    public Optional<Map<String, Object>> verifyToken(String token,String secrete) throws ParseException, JOSEException {
+
+        JWSVerifier verifier=new MACVerifier(secrete);
 
         boolean isValid;
 

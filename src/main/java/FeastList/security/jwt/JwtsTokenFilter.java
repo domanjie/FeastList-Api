@@ -39,7 +39,8 @@ public class JwtsTokenFilter extends OncePerRequestFilter {
 
         String accessToken=authorizationValue.substring(7);
 
-        JwtsTokenAuthentication unAuthenticatedToken=new JwtsTokenAuthentication(accessToken, JwtsTokenAuthentication.TokenType.ACCESS_TOKEN);
+//        JwtsTokenAuthentication unAuthenticatedToken
+         Authentication unAuthenticatedToken       =new JwtsTokenAuthentication(accessToken, JwtsTokenAuthentication.TokenType.ACCESS_TOKEN);
 
         Authentication authenticatedToken= authenticationManager.authenticate(unAuthenticatedToken);
 

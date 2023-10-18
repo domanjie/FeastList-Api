@@ -18,6 +18,11 @@ public class JwtsProvider implements AuthenticationProvider {
     @Value("${REFRESH_TOKEN_SECRET}")
     private  String REFRESH_TOKEN_SECRET;
 
+    private final JwtsTokenService jwtsTokenService;
+    public JwtsProvider(JwtsTokenService jwtsTokenService){
+        this.jwtsTokenService=jwtsTokenService;
+    }
+
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -30,7 +35,7 @@ public class JwtsProvider implements AuthenticationProvider {
 
         Optional<Map<String,Object>> optionalTokenPayload;
         try {
-            optionalTokenPayload=new JwtsTokenServiceImpl(secret).verifyToken(token);
+            optionalTokenPayload= jwtsTokenService.verifyToken(token,secret);
         } catch (ParseException | JOSEException e) {
             throw new RuntimeException(e);
         }

@@ -1,23 +1,23 @@
-package FeastList.restaurants;
+package FeastList.users.vendors;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
-public class RestaurantServiceImpl implements RestaurantService {
+public class VendorServiceImpl implements VendorService {
     @Override
-    public List<Restaurant> getRestaurants() {
+    public List<Vendor> getRestaurants() {
         return List.of();
     }
 
     @Override
-    public Restaurant saveRestaurant(Restaurant restaurant) {
+    public Vendor saveRestaurant(Vendor vendor) {
         return null;
     }
 
     @Override
-    public Optional<Restaurant> getRestaurantById(int restaurantId) {
+    public Optional<Vendor> getRestaurantById(int restaurantId) {
         return Optional.empty();
     }
 

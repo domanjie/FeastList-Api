@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface JwtsTokenService {
-    String createToken(Payload payload ) throws JOSEException;
+    String createToken(Payload payload, String tokenSecret) throws JOSEException;
 
-    Optional<Map<String, Object>> verifyToken(String Token) throws ParseException, JOSEException;
+    Optional<Map<String, Object>> verifyToken(String Token, String tokenSecret) throws ParseException, JOSEException;
 
 
 }

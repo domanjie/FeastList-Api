@@ -17,7 +17,7 @@ import java.util.*;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @Value("${REFRESH_TOKEN_EXPIRATION_TIME}")
-    private  long REFRESH_TOKEN_EXPIRATION_TIME;
+    private  long RT_COOKIE_EXPIRATION_TIME;
     private final LogoutHandler logoutHandler;
 
     public AuthenticationController(AuthenticationService authenticationService,
@@ -44,14 +44,14 @@ public class AuthenticationController {
     public String unAuthenticatePrincipal(@AuthenticationPrincipal Authentication authentication,
                                           HttpServletRequest request,HttpServletResponse response) throws JOSEException {
 
-        Map<String,String> tokens=getCurrentRequestTokens(request);
+        Map<String,String> tokens=getTokensFromRequest(request);
 
         logoutHandler.logout(request, response, authentication);
 
         return authenticationService.revokeTokens(tokens);
     }
 
-    private static Map<String, String> getCurrentRequestTokens(HttpServletRequest request) {
+    private static Map<String, String> getTokensFromRequest(HttpServletRequest request) {
 
         Map<String,String> tokens=new HashMap<>();
 
@@ -100,7 +100,7 @@ public class AuthenticationController {
 
         cookie.setHttpOnly(true);
 
-        int cookieTTL=(int)(new Date().getTime()+REFRESH_TOKEN_EXPIRATION_TIME);
+        int cookieTTL=(int)(new Date().getTime()+RT_COOKIE_EXPIRATION_TIME);
 
         cookie.setMaxAge(cookieTTL);
 

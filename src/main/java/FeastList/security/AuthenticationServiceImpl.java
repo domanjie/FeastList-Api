@@ -1,6 +1,7 @@
 package FeastList.security;
 
 import FeastList.security.jwt.JwtsTokenAuthentication;
+import FeastList.security.jwt.JwtsTokenService;
 import FeastList.security.jwt.JwtsTokenServiceImpl;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.Payload;
@@ -18,22 +19,29 @@ import java.util.Map;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService{
-    @Value("${REFRESH_TOKEN_SECRET}")
-    private   String REFRESH_TOKEN_SECRET;
-    @Value("${ACCESS_TOKEN_SECRET}")
-    private   String ACCESS_TOKEN_SECRET;
     @Value("${ACCESS_TOKEN_EXPIRATION_TIME}")
     private  long ACCESS_TOKEN_EXPIRATION_TIME;
     @Value("${REFRESH_TOKEN_EXPIRATION_TIME}")
     private  long REFRESH_TOKEN_EXPIRATION_TIME;
 
+    @Value("${REFRESH_TOKEN_SECRET}")
+    private   String REFRESH_TOKEN_SECRET;
+    @Value("${ACCESS_TOKEN_SECRET}")
+    private   String ACCESS_TOKEN_SECRET;
+
+    private final JwtsTokenService jwtsTokenService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationServiceImpl(AuthenticationManager authenticationManager){
+
+
+    public AuthenticationServiceImpl(AuthenticationManager authenticationManager, JwtsTokenService jwtsTokenService){
 
         this.authenticationManager=authenticationManager;
 
+
+        this.jwtsTokenService = jwtsTokenService;
     }
+    //login users with username and password
     @Override
     public Map<String, String> loginPrincipal(LoginRequest loginRequest) throws JOSEException {
         UsernamePasswordAuthenticationToken token= UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),loginRequest.password());
@@ -55,7 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         //perform blacklist of tokens using redis
         return "successful logout";
     }
-
+    //get new set of tokens using refreshToken
     @Override
     public Map<String, String> refreshTokens(String refreshToken) throws JOSEException {
 
@@ -79,10 +87,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
         refreshTokenPayload.replace("exp",new Date().getTime()+REFRESH_TOKEN_EXPIRATION_TIME*1000);
 
-        String accessToken=new JwtsTokenServiceImpl(ACCESS_TOKEN_SECRET).createToken(new Payload(accessTokenPayload));
+        String accessToken=jwtsTokenService.createToken(new Payload(accessTokenPayload),ACCESS_TOKEN_SECRET);
 
-        String refreshToken=new JwtsTokenServiceImpl(REFRESH_TOKEN_SECRET).createToken(new Payload(refreshTokenPayload));
-
+        String refreshToken=jwtsTokenService.createToken(new Payload(refreshTokenPayload),REFRESH_TOKEN_SECRET);
         Map<String,String> tokens=new HashMap<>();
         tokens.put("accessToken",accessToken);
         tokens.put("refreshToken",refreshToken);
