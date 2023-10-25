@@ -1,13 +1,18 @@
 package FeastList.users;
 
-import FeastList.users.dto.PasswordResetDto;
 import FeastList.users.dto.PasswordUpgradeDto;
-import FeastList.users.dto.ResetCodeDto;
+import FeastList.users.dto.RunnerDto;
+import FeastList.users.dto.UserDto;
+import FeastList.users.dto.VendorDto;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,7 +23,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String createNewUser(User user) {
+    public String saveClient(UserDto userDto) {
+    	User user=User
+    			.builder()
+    			.userId(userDto.userId())
+    			.password(userDto.passwordConfirm())
+    			.gender(Gender.valueOf(userDto.gender()))
+                .isEnabled(false)
+                .role(Role.CLIENT)
+    			.build();
 
         userRepository.saveUser(user);
 
@@ -34,55 +47,26 @@ public class UserServiceImpl implements UserService {
 
         user.setEnabled(true);
 
-        userRepository.saveUser(user);
+        userRepository.updateUser(user);
 
         return "user activated successfully";
     }
 
     @Override
-    @Transactional
-    public String resetPassword(PasswordResetDto passwordResetDto) {
-
-
-        User user = userRepository.findById(passwordResetDto.userIdentity());
-
-        if (!(passwordResetDto.resetCode().equals(user.getPasswordResetCode())))
-            throw new PasswordException("invalid password reset code");
-
-        user.setPasswordResetCode(null);
-
-        user.setPassword(passwordResetDto.passwordConfirm());
-
-        userRepository.saveUser(user);
-
-        return "password reset success";
-
-    }
-
-    @Override
     public String updatePassword(PasswordUpgradeDto passwordUpgradeDto) {
+
         String identity = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findById(identity);
 
         user.setPassword(passwordUpgradeDto.passwordConfirm());
 
-        userRepository.saveUser(user);
+        userRepository.updateUser(user);
 
         return "password updated successfully";
     }
 
-    @Override
-    @Transactional
-    public String confirmResetCode(ResetCodeDto resetCodeDto) {
 
-        String userId = userRepository.getIdentityByResetCode(resetCodeDto.resetCode());
-
-        if (!(resetCodeDto.userId().equals(userId))) throw new EmailException();
-
-        return userId;
-
-    }
 
     @Override
     public User getUserById(String userId) {
@@ -91,21 +75,47 @@ public class UserServiceImpl implements UserService {
 
     }
 
+	@Override
+	public String saveVendor(VendorDto vendorDto) {
+		User user=User.builder()
+                .userId(vendorDto.userId())
+                .state(vendorDto.state())
+                .city(vendorDto.city())
+                .street(vendorDto.street())
+                .location(vendorDto.location())
+                .avatarUrl(vendorDto.avatarUrl())
+                .role(Role.VENDOR)
+                .vendorName(vendorDto.vendorName())
+                .phoneNumber(vendorDto.phoneNumber())
+                .password(vendorDto.passwordConfirm())
+                .isEnabled(false)
+                .dateJoined(new Timestamp(new Date().getTime()))
+                .build();
+        return userRepository.saveUser(user);
+	}
     @Override
-    @Transactional
-    public String forgetPassword(String email) {
+    public String saveRunner(RunnerDto runnerDto) {
+        User user=User.builder()
+                .gender(Gender.valueOf(runnerDto.gender()))
+                .userId(runnerDto.userId())
+                .password(runnerDto.passwordConfirm())
+                .avatarUrl(runnerDto.avatarUrl())
+                .state(runnerDto.state())
+                .city(runnerDto.city())
+                .street(runnerDto.state())
+                .location(runnerDto.Location())
+                .firstName(runnerDto.firstName())
+                .lastName(runnerDto.lastName())
+                .isEnabled(false)
+                .role(Role.RUNNER)
+                .dateJoined(new Timestamp(new Date().getTime()))
+                .build();
+       return userRepository.saveUser(user);
+    }
 
-        User user = userRepository.findById(email);
-
-        String passwordResetCode = UUID.randomUUID().toString().substring(0, 7);
-
-        user.setPasswordResetCode(passwordResetCode);
-
-        sendEmail(email, passwordResetCode);
-
-        userRepository.saveUser(user);
-
-        return " password reset code sent to" + email;
-
+    @Override
+    public List<User> getUsersByrole(String role) {
+        Role userRole=Role.valueOf(role);
+       return userRepository.getUsersByRole(userRole);
     }
 }

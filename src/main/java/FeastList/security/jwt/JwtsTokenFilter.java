@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -39,8 +39,7 @@ public class JwtsTokenFilter extends OncePerRequestFilter {
 
         String accessToken=authorizationValue.substring(7);
 
-//        JwtsTokenAuthentication unAuthenticatedToken
-         Authentication unAuthenticatedToken       =new JwtsTokenAuthentication(accessToken, JwtsTokenAuthentication.TokenType.ACCESS_TOKEN);
+        Authentication unAuthenticatedToken       =new JwtsTokenAuthentication(accessToken, JwtsTokenAuthentication.TokenType.ACCESS_TOKEN);
 
         Authentication authenticatedToken= authenticationManager.authenticate(unAuthenticatedToken);
 
