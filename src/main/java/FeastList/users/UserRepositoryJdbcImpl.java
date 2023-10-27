@@ -5,15 +5,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Array;
-import java.sql.Timestamp;
 import java.util.List;
 @Repository
-public class JdbcUserRepositoryImpl implements UserRepository{
+public class UserRepositoryJdbcImpl implements UserRepository{
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public JdbcUserRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public UserRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate=jdbcTemplate;
     }
     @Override

@@ -1,19 +1,20 @@
 package FeastList.passwordReset;
 
 import FeastList.users.User;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
+@Builder
 public class PasswordReset {
-    private  String passwordResetCode;
+    private final String passwordResetCode;
 
-    private  long TTL;
+    private final long TTL;
 
-    private  User user;
+    private  final User user;
 
     public boolean isValid() {
         return new Date().before(new Date(TTL));

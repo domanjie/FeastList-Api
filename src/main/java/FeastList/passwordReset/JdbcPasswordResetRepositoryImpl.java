@@ -17,22 +17,22 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
     }
     @Override
     public void delete(String resetCode) {
-        String query= """
+        var query= """
                 DELETE FROM password_reset
                 WHERE reset_code=:resetCode
                 """;
-        MapSqlParameterSource params=new MapSqlParameterSource()
+        var params=new MapSqlParameterSource()
                 .addValue(":resetCode",resetCode);
         jdbcTemplate.update(query,params);
     }
 
     @Override
     public PasswordReset save(PasswordReset passwordReset) {
-        String query= """
+        var query= """
                 INSERT INTO  password_reset (reset_code,ttl,user)
                 VALUES (:resetCode,:ttl,:user)
                 """;
-        MapSqlParameterSource params =new MapSqlParameterSource()
+        var params =new MapSqlParameterSource()
                 .addValue("resetCode",passwordReset.getPasswordResetCode())
                 .addValue("ttl",passwordReset.getTTL())
                 .addValue("user",passwordReset.getUser().getUserId());
@@ -42,7 +42,7 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
 
     @Override
     public PasswordReset findByResetCode(String resetCode) {
-        String query= """
+        var query= """
                 SELECT user_id , password , date_joined , phone_number,
                 location , state , city , street , zip ,user_role , is_enabled ,
                 avatar_url, vendor_name, first_name, last_name, gender , reset_code , ttl
@@ -53,7 +53,7 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
                 LEFT JOIN vendor_detail  ON user_id=vendor_id
                 WHERE reset_code=:resetCode;
                 """;
-        MapSqlParameterSource param=new MapSqlParameterSource()
+        var param=new MapSqlParameterSource()
                 .addValue("reset_code",resetCode);
 
 
@@ -79,11 +79,12 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
                     .lastName(rs.getString("last_name"))
                     .gender(Gender.valueOf(rs.getString("gender")))
                     .build();
-            PasswordReset passwordReset = new PasswordReset();
-            passwordReset.setUser(user);
-            passwordReset.setPasswordResetCode(rs.getString("reset_code"));
-            passwordReset.setTTL(rs.getLong("ttl"));
-            return passwordReset;
+
+            return PasswordReset
+                    .builder()
+                    .user(user)
+                    .passwordResetCode(rs.getString("reset_code"))
+                    .TTL(rs.getLong("ttl")).build();
         };
     }
 }
