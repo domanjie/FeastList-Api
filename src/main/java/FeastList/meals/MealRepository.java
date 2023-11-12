@@ -1,14 +1,16 @@
 package FeastList.meals;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MealRepository {
+	int save(Meal meal);
 
-	Meal save(Meal meal);
+	Optional<Meal> getMealById(Long mealId);
 
-	Optional<Iterable<Meal>> getRecentMeals();
+	Meal deleteMealById(Long mealId);
 
-	Optional<Iterable<Meal>> getTrayMeals();
+    List<Meal> getMealByRestaurants(String restaurantId);
 
-	String deleteById(Long id);
+	List<Meal> getMeals();
 }

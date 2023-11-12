@@ -1,0 +1,11 @@
+CREATE  TABLE users(
+	user_id VARCHAR(90) PRIMARY KEY,
+	password VARCHAR(180) NOT NULL,
+	phoneNumber VARCHAR(20),
+	location VARCHAR(255),
+	zip_code VARCHAR(10),
+	role ENUM("ADMIN","CLIENT","RUNNER","VENDOR") NOT NULL,
+	is_enabled BOOLEAN NOT NULL,
+	avatar_url VARCHAR(512),
+	date_joined TIMESTAMP NOT NULL DEFAULT NOW()
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;

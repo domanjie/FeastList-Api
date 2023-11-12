@@ -1,34 +1,37 @@
 package FeastList.menuItems;
 
-import FeastList.users.vendors.Vendor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
 public class MenuItemServiceImpl implements MenuItemService{
+    private final MenuItemRepository menuItemRepo;
+    public MenuItemServiceImpl(MenuItemRepository menuItemRepo){
+        this.menuItemRepo=menuItemRepo;
+    }
     @Override
-    public MenuItem saveRestaurantMenuItem(Vendor vendor, MenuItem menuItem) {
-        return null;
+    public int saveRestaurantMenuItem( MenuItem menuItem) {
+        return menuItemRepo.saveMenuItem(menuItem);
     }
 
     @Override
-    public Optional<MenuItem> getMenuItemById(long itemId) {
-        return Optional.empty();
+    public Optional<MenuItem> getMenuItemById(int itemId) {
+        return menuItemRepo.getMenuItemById(itemId);
     }
 
     @Override
-    public List<MenuItem> getMenuItemsByRestaurant(int restaurantId) {
-        return List.of();
+    public List<MenuItem> getMenuItemsByVendor(String vendorId) {
+        return menuItemRepo.getByVendor(vendorId);
     }
 
     @Override
-    public MenuItem updateRestaurantMenuItem(Vendor vendor, MenuItem menuItem, long id) {
-        return null;
+    public void updateRestaurantMenuItem( MenuItem menuItem, long id) {
+         menuItemRepo.updateMenuItem(menuItem, id);
     }
 
     @Override
-    public void deleteRestaurantMenuItem(Vendor vendor, long ItemId) {
-
+    public void deleteRestaurantMenuItem(long itemId) {
+         menuItemRepo.deleteMenuItem(itemId);
     }
 }

@@ -1,17 +1,16 @@
 package FeastList.meals;
 
 import java.util.List;
-
-import FeastList.users.User;
+import java.util.Optional;
 
 public interface MealService {
+	int saveMeal(Meal meal);
 
-	Meal saveUserMeal(Meal meal, User user);
+	Meal deleteMeal(Long mealId);
 
-	List<Meal> getRecentMeals(User user);
+	Optional<Meal> getMeal(Long mealId);
 
-	String deleteUserTrayMealById(Long id, User user);
+	List<Meal> getMeals();
 
-	List<Meal> getTrayMeals(User user);
-
+	List<Meal> getMealsByRestaurant(String restaurantId);
 }

@@ -73,7 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
        return getTokens(authenticated);
     }
 
-    private Map<String,String> getTokens(Authentication authentication) throws JOSEException {
+    private Map<String,String>  getTokens(Authentication authentication) throws JOSEException {
 
         Map<String,Object> accessTokenPayload=new HashMap<>();
 

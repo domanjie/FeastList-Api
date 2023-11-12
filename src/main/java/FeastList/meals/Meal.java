@@ -1,62 +1,33 @@
 package FeastList.meals;
 
-import java.util.Objects;
-
+import FeastList.menuItems.MenuItem;
 import FeastList.orders.Order;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-public class Meal {
-	private final long id;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Map;
+
+@Data
+@AllArgsConstructor
+public class Meal  {
+
+	private final int id;
+
+	private final String name;
+
 	private final double price;
-	private final Order order;
-	private final int amount;
-	
-	public Meal(long id, double price, Order order, int amount) {
-		this.id = id;
-		this.price = price;
-		this.order = order;
-		this.amount = amount;
-	}
-	
-	@SuppressWarnings("unused")
-	private Meal() {
-		id=0;
-		price=0;
-		order=null;
-		amount=0;	
-	}
-	
-	
-	public long getId() {
-		return id;
-	}
-	public double getPrice() {
-		return price;
-	}
-	public Order getOrder() {
-		return order;
-	}
-	public int getAmount() {
-		return amount;
-	}
-	@Override
-	public int hashCode() {
-		return Objects.hash(amount, id, order, price);
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Meal other = (Meal) obj;
-		return amount == other.amount && id == other.id && Objects.equals(order, other.order)
-				&& Double.doubleToLongBits(price) == Double.doubleToLongBits(other.price);
-	}
-	@Override
-	public String toString() {
-		return "Meals [id=" + id + ", price=" + price + ", order=" + order + ", amount=" + amount + "]";
-	}
-	
+
+	public final Timestamp  dateAdded;
+
+	private final MealType mealType;
+
+	private final String avatarUrl;
+
+	private  String userId;
+
+	private  Map<Integer,Integer> mealItems;
+
 }

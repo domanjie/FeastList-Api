@@ -23,10 +23,7 @@ public class User implements UserDetails{
 	private  Timestamp dateJoined;
 	private  String phoneNumber;
 	private  String location;
-	private  String state;
-	private  String city;
-	private  String street;
-	private  String zip;
+	private  String zipCode;
 	private Role role;
 	private boolean isEnabled;
 	private String avatarUrl;

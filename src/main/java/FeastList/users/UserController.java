@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path="/api/v1/rle",produces="application/json")
+@CrossOrigin(origins= "http://localhost:5173")
 public  class UserController {
     private final UserService userService;
 
@@ -29,7 +30,7 @@ public  class UserController {
     @GetMapping
     public ResponseEntity<List<User>> getVendors(@RequestParam String role) {
 
-        List<User> users = userService.getUsersByrole(role);
+        List<User> users = userService.getUsersByRole(role);
         if (!users.isEmpty()) return new ResponseEntity<List<User>>(users, HttpStatus.OK);
         else return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
@@ -41,6 +42,7 @@ public  class UserController {
 
     @PostMapping("/client")
     public String addProfile(@RequestBody @Valid UserDto userDto) {
+        System.err.println("domanjie e ddey happen for her");
         return userService.saveClient(userDto);
     }
 

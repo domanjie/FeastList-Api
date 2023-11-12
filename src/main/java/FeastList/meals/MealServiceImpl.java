@@ -1,29 +1,44 @@
 package FeastList.meals;
 
-import FeastList.users.User;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MealServiceImpl implements MealService{
-    @Override
-    public Meal saveUserMeal(Meal meal, User user) {
-        return null;
+
+    private final MealRepository mealRepository;
+    public MealServiceImpl (MealRepository mealRepository){
+        this.mealRepository=mealRepository;
     }
 
     @Override
-    public List<Meal> getRecentMeals(User user) {
-        return List.of();
+    public int saveMeal(Meal meal) {
+        meal.setUserId(SecurityContextHolder.getContext().getAuthentication().getName());
+        return mealRepository.save(meal);
     }
 
     @Override
-    public String deleteUserTrayMealById(Long id, User user) {
-        return null;
+    public Meal deleteMeal(Long mealId) {
+        return mealRepository.deleteMealById(mealId );
     }
 
     @Override
-    public List<Meal> getTrayMeals(User user) {
-        return List.of();
+    public Optional<Meal> getMeal(Long mealId) {
+        return mealRepository.getMealById(mealId);
     }
+
+    @Override
+    public List<Meal> getMeals() {
+        return mealRepository.getMeals();
+    }
+
+
+    public List<Meal> getMealsByRestaurant(String restaurantId){
+        return mealRepository.getMealByRestaurants (restaurantId);
+    }
+
+
 }

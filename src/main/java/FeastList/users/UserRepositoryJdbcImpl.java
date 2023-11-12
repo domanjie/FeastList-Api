@@ -1,5 +1,6 @@
 package FeastList.users;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,10 +18,10 @@ public class UserRepositoryJdbcImpl implements UserRepository{
     @Override
     public String saveUser(User user) {
         String query1= """
-                INSERT INTO users(user_id , password , date_joined , phone_number,
-                location , state , city , street ,zip , user_role , is_enabled , avatar_url )
-                VALUES (:userId , :password ,:dateJoined ,:phoneNumber,:location , :state, :city , :street , :zip ,
-                :role , :isEnabled, : avatarUrl,);
+                INSERT INTO users(user_id , password , phone_number,
+                location ,zip_code , role , is_enabled , avatar_url )
+                VALUES (:userId , :password ,:phoneNumber,:location , :zip ,
+                :role , :isEnabled, :avatarUrl);
                 """;
         MapSqlParameterSource params=getUserMappedParams(user);
 
@@ -50,8 +51,8 @@ public class UserRepositoryJdbcImpl implements UserRepository{
     public User findById(String userId) {
         String query= """
                 SELECT user_id , password , date_joined , phone_number,
-                location , state , city , street ,zip , user_role , is_enabled ,
-                avatar_url,vendor_name,first_name,last_name,gender 
+                location ,zip_code , role , is_enabled ,
+                avatar_url,vendor_name,first_name,last_name,gender
                 FROM
                 users
                 LEFT JOIN client_runner_detail ON user_id=id
@@ -75,13 +76,13 @@ public class UserRepositoryJdbcImpl implements UserRepository{
     public List<User> getUsersByRole(Role userRole) {
         String query= """
                 SELECT user_id , password , date_joined , phone_number,
-                location , state , city , street ,zip , user_role , is_enabled ,
-                avatar_url,vendor_name,first_name,last_name,gender 
+                location, zip_code , role , is_enabled ,
+                avatar_url,vendor_name,first_name,last_name,gender
                 FROM
                 users
                 LEFT JOIN client_runner_detail ON user_id=id
                 LEFT JOIN vendor_detail ON user_id=vendor_id
-                WHERE user_role=:userRole
+                WHERE role=:userRole
                 ORDER BY user_id;
                 """;
         MapSqlParameterSource param=new MapSqlParameterSource()
@@ -91,20 +92,15 @@ public class UserRepositoryJdbcImpl implements UserRepository{
 
     @Override
     public void updateUser(User user) {
-
         String query= """
                 UPDATE users SET
                 password=:password,
-                date_joined=:dateJoined,
                 phone_number=:phoneNumber,
                 location=:location,
-                state=:state,
-                city=:city,
-                street=:street,
-                zip=:zip,
+                zip_code=:zip,
                 role=:role,
                 is_enabled=:isEnabled,
-                avatar_url=:avatarUrl,
+                avatar_url=:avatarUrl
                 WHERE user_id =:userId
                 """;
         MapSqlParameterSource params=getUserMappedParams(user);
@@ -125,12 +121,12 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                     UPDATE client_runner_detail SET
                     first_name =:firstName,
                     last_name=:lastName,
-                    gender=:gender,
-                    WHERE id=:id
+                    gender=:gender
+                    WHERE id=:id;
                     """;
             extraParams=getVendorParams(user);
         }
-        jdbcTemplate.update(query,params);
+        jdbcTemplate.update(query2,extraParams);
     }
 
     private RowMapper<User> userRowMapper(){
@@ -141,10 +137,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                     .dateJoined(rs.getTimestamp("date_joined"))
                     .phoneNumber(rs.getString("phone_number"))
                     .location(rs.getString("location"))
-                    .state(rs.getString("state"))
-                    .city(rs.getString("city"))
-                    .street(rs.getString("street"))
-                    .zip(rs.getString("zip"))
+                    .zipCode(rs.getString("zip"))
                     .role(Role.valueOf(rs.getString("role")))
                     .isEnabled(rs.getBoolean("is_enabled"))
                     .avatarUrl(rs.getString("avatar_url"))
@@ -160,13 +153,9 @@ public class UserRepositoryJdbcImpl implements UserRepository{
         return new MapSqlParameterSource()
                 .addValue("userId",user.getUserId())
                 .addValue("password",user.getPassword())
-                .addValue("dateJoined",user.getDateJoined())
                 .addValue("phoneNumber",user.getPhoneNumber())
                 .addValue("location",user.getLocation())
-                .addValue("state",user.getState())
-                .addValue("city",user.getCity())
-                .addValue("street",user.getStreet())
-                .addValue("zip",user.getZip())
+                .addValue("zip",user.getZipCode())
                 .addValue("role",user.getRole().toString())
                 .addValue("isEnabled",user.isEnabled())
                 .addValue("avatarUrl",user.getAvatarUrl());
@@ -187,5 +176,4 @@ public class UserRepositoryJdbcImpl implements UserRepository{
     private boolean isVendor(User user){
        return user.getRole().equals(Role.VENDOR);
     }
-
 }

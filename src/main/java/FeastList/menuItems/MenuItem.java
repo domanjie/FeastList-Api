@@ -1,67 +1,19 @@
 package FeastList.menuItems;
 
+import java.sql.Timestamp;
 import java.util.Objects;
 
-import FeastList.users.vendors.Vendor;
+import FeastList.users.User;
+import com.sun.jna.platform.win32.Sspi;
+import lombok.Data;
 
+@Data
 public class MenuItem {
-	private final long  id;
-	private final String name;
-	private final  double price_per_portion;
-	private final Vendor vendor;
-	private final String avatar_url;
-	
-	public MenuItem(long id, String name, double price_per_portion, Vendor vendor, String avatar_url) {
-		this.id = id;
-		this.name = name;
-		this.price_per_portion = price_per_portion;
-		this.vendor = vendor;
-		this.avatar_url = avatar_url;
-	}
 
-	@SuppressWarnings("unused")
-	private MenuItem() {
-		id=0;
-		name=null;
-		price_per_portion=0;
-		vendor =null;
-		avatar_url=null;
-	}
-	public long getId() {
-		return id;
-	}
-	public String getName() {
-		return name;
-	}
-	public double getPrice_per_portion() {
-		return price_per_portion;
-	}
-	public Vendor getRestaurant() {
-		return vendor;
-	}
-	public String getAvatar_url() {
-		return avatar_url;
-	}
-	@Override
-	public int hashCode() {
-		return Objects.hash(avatar_url, id, name, price_per_portion, vendor);
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MenuItem other = (MenuItem) obj;
-		return Objects.equals(avatar_url, other.avatar_url) && id == other.id && Objects.equals(name, other.name)
-				&& Double.doubleToLongBits(price_per_portion) == Double.doubleToLongBits(other.price_per_portion)
-				&& vendor == other.vendor;
-	}
-	@Override
-	public String toString() {
-		return "FoodItems [id=" + id + ", name=" + name + ", price_per_portion=" + price_per_portion + ", restuarant="
-				+ vendor + ", avatar_url=" + avatar_url + "]";
-	}
+	private final int  id;
+	private final String name;
+	private final double pricePerPortion;
+	private final String vendorId;
+	private final String avatarUrl;
+	private final Timestamp date_added;
 }

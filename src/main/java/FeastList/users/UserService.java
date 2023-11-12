@@ -25,5 +25,5 @@ public interface UserService {
 	String saveRunner(RunnerDto runnerDto);
 
 
-    List<User> getUsersByrole(String role);
+    List<User> getUsersByRole(String role);
 }

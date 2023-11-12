@@ -14,6 +14,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(path="/api/v1/authentication" ,produces="application/json")
+@CrossOrigin(origins= "http://localhost:5173")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @Value("${REFRESH_TOKEN_EXPIRATION_TIME}")

@@ -79,9 +79,6 @@ public class UserServiceImpl implements UserService {
 	public String saveVendor(VendorDto vendorDto) {
 		User user=User.builder()
                 .userId(vendorDto.userId())
-                .state(vendorDto.state())
-                .city(vendorDto.city())
-                .street(vendorDto.street())
                 .location(vendorDto.location())
                 .avatarUrl(vendorDto.avatarUrl())
                 .role(Role.VENDOR)
@@ -100,9 +97,6 @@ public class UserServiceImpl implements UserService {
                 .userId(runnerDto.userId())
                 .password(runnerDto.passwordConfirm())
                 .avatarUrl(runnerDto.avatarUrl())
-                .state(runnerDto.state())
-                .city(runnerDto.city())
-                .street(runnerDto.state())
                 .location(runnerDto.Location())
                 .firstName(runnerDto.firstName())
                 .lastName(runnerDto.lastName())
@@ -114,7 +108,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsersByrole(String role) {
+    public List<User> getUsersByRole(String role) {
         Role userRole=Role.valueOf(role);
        return userRepository.getUsersByRole(userRole);
     }

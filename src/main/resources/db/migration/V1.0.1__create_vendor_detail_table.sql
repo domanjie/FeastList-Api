@@ -1,0 +1,5 @@
+CREATE TABLE vendor_detail(
+	vendor_id VARCHAR(90) PRIMARY KEY,
+	vendor_name VARCHAR(100) NOT NULL,
+	CONSTRAINT fk_users_vendor_detail  FOREIGN KEY(vendor_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;

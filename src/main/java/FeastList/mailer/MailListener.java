@@ -16,10 +16,4 @@ public class MailListener {
         mailerService.sendPasswordResetEmail( passwordResetEvent.getResetCode(), passwordResetEvent.getUserId());
     }
 
-    @EventListener
-    public void handleUserActivationEvent()
-    {
-
-    }
-
 }

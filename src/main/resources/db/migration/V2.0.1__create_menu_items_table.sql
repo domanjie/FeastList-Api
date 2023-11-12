@@ -1,0 +1,10 @@
+CREATE TABLE menu_items(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(30)NOT NULL,
+	price_per_portion FLOAT(11,3) NOT NULL,
+	vendor_id VARCHAR(90)NOT NULL,
+	avatar_url VARCHAR (512),
+	date_added TIMESTAMP NOT NULL DEFAULT NOW(),
+	UNIQUE(name,vendor_id),
+	CONSTRAINT fk_users_menu_items FOREIGN KEY(vendor_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;

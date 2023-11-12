@@ -57,7 +57,6 @@ public class JwtsProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        System.err.println("supports was called");
         return JwtsTokenAuthentication.class.isAssignableFrom(authentication);
     }
 }
