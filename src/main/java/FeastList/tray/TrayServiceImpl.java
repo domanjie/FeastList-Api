@@ -1,7 +1,7 @@
 package FeastList.tray;
 
 import FeastList.meals.Meal;
-import FeastList.meals.MealRepository;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,14 +15,16 @@ public class TrayServiceImpl implements TrayService {
     }
     @Override
     public String clearTray() {
-        trayRepo.emptyTray();
+        var userId=SecurityContextHolder.getContext().getAuthentication().getName();
+        trayRepo.emptyUserTray(userId);
         return "Tray successfully cleared";
     }
 
     @Override
     @Transactional
-    public void addToTray(Meal meal) {
-      trayRepo.addToTray(meal);
+    public void addToTray(TrayItemDto trayItemDto) {
+        var userId=SecurityContextHolder.getContext().getAuthentication().getName();
+      trayRepo.addToTray(trayItemDto,userId);
     }
 
     @Override
@@ -32,7 +34,7 @@ public class TrayServiceImpl implements TrayService {
     }
     @Override
     public void deleteFromTray(Long mealId) {
-
-       trayRepo.deleteFromTray(mealId);
+        String userId =SecurityContextHolder.getContext().getAuthentication().getName();
+        trayRepo.deleteFromTray(mealId,userId);
     }
 }

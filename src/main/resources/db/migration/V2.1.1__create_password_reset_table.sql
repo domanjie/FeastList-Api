@@ -1,0 +1,6 @@
+CREATE TABLE password_reset(
+    user_id VARCHAR(90) PRIMARY KEY,
+    reset_code VARCHAR(10)NOT NULL,
+    ttl BIGINT NOT NULL,
+    CONSTRAINT fk_users_pasword_reset FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;

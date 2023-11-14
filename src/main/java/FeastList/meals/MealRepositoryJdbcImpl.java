@@ -4,9 +4,10 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
-
+@Repository
 public class MealRepositoryJdbcImpl implements MealRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -44,12 +45,18 @@ public class MealRepositoryJdbcImpl implements MealRepository {
     @Override
     public Optional<Meal> getMealById(Long mealId) {
         String query= """
-                SELECT id,name,price,date_added,meal_type,avatar_url,user_id,menu_item_id,amount
-                FROM meals
+                SELECT a.id,a.name,a.price,a.avatar_url,
+                a.user_id,a.meal_type,a.date_added,
+                b.amount,
+                c.id AS menu_item_id ,c.name AS menu_item_name,c.price_per_portion AS menu_item_ppp,c.vendor_id,
+                c.avatar_url AS menu_item_avatar_url ,c.date_added AS menu_item_date_added
+                FROM meals AS a
                 LEFT JOIN
-                A_LA_CARTE_meal_items
+                A_LA_CARTE_meal_items AS b
                 ON id=meal_id
-                WHERE id=:mealId
+                LEFT JOIN menu_items AS c
+                ON b.menu_item_id=c.id
+                WHERE a.id=:mealId
                 """;
         var param =new MapSqlParameterSource().addValue(":mealId",mealId);
         var mealCollection= jdbcTemplate.query(query,param,mealExtractor());
@@ -64,13 +71,19 @@ public class MealRepositoryJdbcImpl implements MealRepository {
     @Override
     public List<Meal> getMealByRestaurants(String restaurantId) {
         String query= """
-                SELECT id,name,price,date_added,meal_type,avatar_url,user_id,menu_item_id,amount
-                FROM meals
+                SELECT a.id,a.name,a.price,a.avatar_url,
+                a.user_id,a.meal_type,a.date_added,
+                b.amount,
+                c.id AS menu_item_id ,c.name AS menu_item_name,c.price_per_portion AS menu_item_ppp,c.vendor_id,
+                c.avatar_url AS menu_item_avatar_url ,c.date_added AS menu_item_date_added
+                FROM meals AS a
                 LEFT JOIN
-                A_LA_CARTE_meal_items
+                A_LA_CARTE_meal_items AS b
                 ON id=meal_id
+                LEFT JOIN menu_items AS c
+                ON b.menu_item_id=c.id
                 WHERE user_id=:restaurantId
-                ORDER by date_added
+                ORDER by a.date_added
                 """;
         var param =new MapSqlParameterSource().addValue(":restaurantId",restaurantId);
         return jdbcTemplate.query(query,param,mealExtractor());
@@ -81,14 +94,17 @@ public class MealRepositoryJdbcImpl implements MealRepository {
         return null;
     }
 
-    private void batchInsertClientMealItems(String SQLStatement,Map<Integer,Integer> mealItems,int mealId) {
-        var batchParams=mealItems.entrySet()
+    private void batchInsertClientMealItems(String SQLStatement,Set<MealItemDto> mealItems,int mealId) {
+        var batchParams=mealItems
+
+
+
                 .stream()
                 .map((entry)-> {
                     return new MapSqlParameterSource()
                             .addValue("mealId",mealId)
-                            .addValue("menuItem", entry.getKey())
-                            .addValue("amount", entry.getValue());
+                            .addValue("menuItem", entry.menuItem().getId())
+                            .addValue("amount", entry.amount());
                 })
                 .toArray(MapSqlParameterSource[]::new);
 
@@ -119,14 +135,25 @@ public class MealRepositoryJdbcImpl implements MealRepository {
                 };
 
                 if (is_A_LA_CARTE(meal)) {
-                    HashMap<Integer,Integer> mealItems;
+                    Set<MealItemDto> mealItems;
                     if (meal.getMealItems() == null){
-                        mealItems=new HashMap<>();
+                        mealItems=new HashSet<>();
                     }else {
-                        mealItems=new HashMap<>( meal.getMealItems());
+                        mealItems=new HashSet<>(meal.getMealItems());
                         meal.getMealItems().clear();
                     };
-                    mealItems.put(resultSet.getInt("meal_id"),resultSet.getInt(""));
+                    var mealItem= new MealItemDto(
+                            new MenuItem(
+                                    resultSet.getInt("menu_item_id"),
+                                    resultSet.getString("menu_item_name"),
+                                    resultSet.getDouble("menu_item_ppp"),
+                                    resultSet.getString("vendorId"),
+                                    resultSet.getString("menu_item_avatar_url"),
+                                    resultSet.getTimestamp("menu_item_date_added")
+                            ),
+                            resultSet.getInt("amount")
+                            );
+                    mealItems.add(mealItem);
                     meal.setMealItems(mealItems);
                 }
             }

@@ -1,7 +1,9 @@
 package FeastList.passwordReset;
 
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class PasswordResetEvent extends ApplicationEvent {
     private final String resetCode;
 
@@ -12,11 +14,4 @@ public class PasswordResetEvent extends ApplicationEvent {
         this.userId=userId;
     }
 
-    public String getResetCode() {
-        return resetCode;
-    }
-
-    public String getUserId(){
-        return userId;
-    }
 }

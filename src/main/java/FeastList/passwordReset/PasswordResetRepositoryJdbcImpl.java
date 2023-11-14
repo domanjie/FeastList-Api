@@ -10,9 +10,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository {
+public class PasswordResetRepositoryJdbcImpl implements PasswordResetRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    public JdbcPasswordResetRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate){
+    public PasswordResetRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate){
         this.jdbcTemplate=jdbcTemplate;
     }
     @Override
@@ -27,9 +27,9 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
     }
 
     @Override
-    public PasswordReset save(PasswordReset passwordReset) {
+    public void save(PasswordReset passwordReset) {
         var query= """
-                INSERT INTO  password_reset (reset_code,ttl,user)
+                INSERT INTO  password_reset (reset_code,ttl,user_id)
                 VALUES (:resetCode,:ttl,:user)
                 """;
         var params =new MapSqlParameterSource()
@@ -37,20 +37,22 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
                 .addValue("ttl",passwordReset.getTTL())
                 .addValue("user",passwordReset.getUser().getUserId());
         jdbcTemplate.update(query,params);
-        return  passwordReset;
     }
 
     @Override
     public PasswordReset findByResetCode(String resetCode) {
         var query= """
-                SELECT user_id , password , date_joined , phone_number,
-                location , state , city , street , zip ,user_role , is_enabled ,
-                avatar_url, vendor_name, first_name, last_name, gender , reset_code , ttl
+                SELECT b.user_id , b.password , b.date_joined , b.phone_number,
+                b.location, b.zip_code ,b.role , b.is_enabled ,
+                b.avatar_url, d.vendor_name, c.first_name, c.last_name, c.gender , a.reset_code , a.ttl
                 FROM
-                password_reset
-                JOIN users on user=user_id
-                LEFT JOIN client_runner_detail ON user_id=id
-                LEFT JOIN vendor_detail  ON user_id=vendor_id
+                password_reset AS a
+                JOIN  users AS b
+                ON a.user_id=b.user_id
+                LEFT JOIN client_runner_detail AS c
+                ON b.user_id=c.id
+                LEFT JOIN vendor_detail  AS d
+                ON b.user_id=d.vendor_id
                 WHERE reset_code=:resetCode;
                 """;
         var param=new MapSqlParameterSource()
@@ -67,10 +69,7 @@ public class JdbcPasswordResetRepositoryImpl implements PasswordResetRepository 
                     .dateJoined(rs.getTimestamp("date_joined"))
                     .phoneNumber(rs.getString("phone_number"))
                     .location(rs.getString("location"))
-                    .state(rs.getString("state"))
-                    .city(rs.getString("city"))
-                    .street(rs.getString("street"))
-                    .zip(rs.getString("zip"))
+                    .zipCode(rs.getString("zip_code"))
                     .role(Role.valueOf(rs.getString("role")))
                     .isEnabled(rs.getBoolean("is_enabled"))
                     .avatarUrl(rs.getString("avatar_url"))

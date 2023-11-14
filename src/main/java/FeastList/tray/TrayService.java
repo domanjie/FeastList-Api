@@ -5,7 +5,7 @@ import FeastList.meals.Meal;
 public interface TrayService {
     String clearTray();
 
-    void addToTray(Meal meal);
+    void addToTray(TrayItemDto trayItemDto);
 
     Tray getTray();
 

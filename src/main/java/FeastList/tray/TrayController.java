@@ -21,8 +21,8 @@ public class TrayController {
       return  trayService.clearTray();
     }
     @PostMapping
-    public void addToTray(@RequestBody Meal meal){
-        trayService.addToTray(meal);
+    public void addToTray(@RequestBody TrayItemDto trayItemDto){
+        trayService.addToTray(trayItemDto);
     }
     @DeleteMapping(path = "/delete/{id}")
     public void deleteFromTray(@PathVariable("id") Long id){

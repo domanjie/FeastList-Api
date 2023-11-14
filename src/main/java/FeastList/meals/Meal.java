@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +29,8 @@ public class Meal  {
 
 	private  String userId;
 
-	private  Map<Integer,Integer> mealItems;
+	private Set<MealItemDto> mealItems;
+
+//	private  Map<Integer,Integer> mealItems;
 
 }

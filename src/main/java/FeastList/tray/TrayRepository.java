@@ -3,11 +3,11 @@ package FeastList.tray;
 import FeastList.meals.Meal;
 
 public interface TrayRepository {
-    void emptyTray();
+    void emptyUserTray(String userId);
 
-    void addToTray(Meal meal);
+    void addToTray(TrayItemDto trayItemDto,String clientId);
 
     Tray getTray(String userId);
 
-    void deleteFromTray(Long mealId);
+    void deleteFromTray(Long mealId,String userId);
 }
