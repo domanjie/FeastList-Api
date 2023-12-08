@@ -11,4 +11,6 @@ public interface AuthenticationService {
     String revokeTokens(Map<String,String> tokens);
 
     Map<String, String> refreshTokens(String refreshToken) throws JOSEException;
+
+    String getAuthenticatedUserId();
 }

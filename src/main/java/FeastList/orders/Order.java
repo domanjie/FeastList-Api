@@ -1,97 +1,31 @@
 package FeastList.orders;
 
+import FeastList.meals.Meal;
+import lombok.Builder;
+import lombok.Data;
+
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
-
+@Data
+@Builder
 public class Order {
 	
-	private final long id; 
-	private final  String location;
-	private final String order_issuer;
-	private final String runner;
-	private final long tray;
-	private final Timestamp created_at=new Timestamp(new Date().getTime());
-	private final OrderStatus orderStatus;
-	
-	public Order(long id, String location, String order_issuer, String runner, long tray, OrderStatus orderStatus) {
-		super();
-		this.id = id;
-		this.location = location;
-		this.order_issuer = order_issuer;
-		this.runner = runner;
-		this.tray = tray;
-		this.orderStatus = orderStatus;
-	}
-	@SuppressWarnings("unused")
-	private Order() 
-	{
-		id=0;
-		location=null;
-		order_issuer=null;
-		runner=null;
-		tray=0;
-		orderStatus=null;
-	}
-	
+	private final long orderId;
 
-	public long getId() {
-		return id;
-	}
+	private final String clientId;
 
-	public String getLocation() {
-		return location;
-	}
+	private final String runnerId;
 
-	public String getOrder_issuer() {
-		return order_issuer;
-	}
+	private final String vendorId;
 
-	public String getRunner() {
-		return runner;
-	}
+	private final  String deliveryLocation;
 
-	public long getTray() {
-		return tray;
-	}
+	private final List<OrderItem> orderItems;
 
-	public Timestamp getCreated_at() {
-		return created_at;
-	}
+	private final OrderCost orderCost;
 
-	public OrderStatus getOrderStatus() {
-		return orderStatus;
-	}
+	private final Timestamp placedAt;
 
-	public enum OrderStatus {
-		PENDING_RUNNER,PENDING_DELIVERY,COMPLETED,CANCELLED
-	}
-	@Override
-	public String toString() {
-		return "Orders [id=" + id + ", location=" + location + ", order_issuer=" + order_issuer + ", runner=" + runner
-				+ ", tray=" + tray + ", created_at=" + created_at + ", orderStatus=" + orderStatus + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(created_at, id, location, orderStatus, order_issuer, runner, tray);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Order other = (Order) obj;
-		return Objects.equals(created_at, other.created_at) && id == other.id
-				&& Objects.equals(location, other.location) && orderStatus == other.orderStatus
-				&& Objects.equals(order_issuer, other.order_issuer) && Objects.equals(runner, other.runner)
-				&& tray == other.tray;
-	}
-
-	
-	
 }

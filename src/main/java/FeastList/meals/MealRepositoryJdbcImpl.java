@@ -1,5 +1,5 @@
 package FeastList.meals;
-import FeastList.menuItems.MenuItem;
+import FeastList.menuItem.MenuItem;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -31,6 +31,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
         var keyHolder =new GeneratedKeyHolder();
         jdbcTemplate.update(query,params,keyHolder);
         var mealId= Objects.requireNonNull(keyHolder.getKey()).intValue();
+
         if(meal.getMealType().equals(MealType.A_LA_CARTE))
         {
             var query2= """
@@ -94,7 +95,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
         return null;
     }
 
-    private void batchInsertClientMealItems(String SQLStatement,Set<MealItemDto> mealItems,int mealId) {
+    private void batchInsertClientMealItems(String SQLStatement, Set<MealItem> mealItems, int mealId) {
         var batchParams=mealItems
 
 
@@ -135,21 +136,21 @@ public class MealRepositoryJdbcImpl implements MealRepository {
                 };
 
                 if (is_A_LA_CARTE(meal)) {
-                    Set<MealItemDto> mealItems;
+                    Set<MealItem> mealItems;
                     if (meal.getMealItems() == null){
                         mealItems=new HashSet<>();
                     }else {
                         mealItems=new HashSet<>(meal.getMealItems());
                         meal.getMealItems().clear();
                     };
-                    var mealItem= new MealItemDto(
+                    var mealItem= new MealItem(
                             new MenuItem(
                                     resultSet.getInt("menu_item_id"),
                                     resultSet.getString("menu_item_name"),
                                     resultSet.getDouble("menu_item_ppp"),
                                     resultSet.getString("vendorId"),
-                                    resultSet.getString("menu_item_avatar_url"),
-                                    resultSet.getTimestamp("menu_item_date_added")
+                                    resultSet.getTimestamp("menu_item_date_added"),
+                                    resultSet.getString("menu_item_avatar_url")
                             ),
                             resultSet.getInt("amount")
                             );

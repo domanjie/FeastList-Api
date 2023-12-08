@@ -1,4 +1,4 @@
-package FeastList.menuItems;
+package FeastList.menuItem;
 
 import java.util.List;
 import java.util.Optional;

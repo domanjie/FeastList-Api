@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import FeastList.users.User;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,21 +26,21 @@ public class OrderController {
 		this.orderService=orderService;
 	}
 	@PostMapping
-	public Order saveUserOrder(@RequestBody Order order ,@AuthenticationPrincipal User user){
-		return orderService.save(order,user);
+	public int saveUserOrder(@RequestBody Order order ){
+		return orderService.save(order);
 		
 	}
 	@GetMapping
-	public ResponseEntity<List<Order>> retrieveCurrentOrders(@AuthenticationPrincipal UserDetails userDetails){
-		List<Order> orders=orderService.getOrders(userDetails);
-		if(!orders.isEmpty()){
+	public ResponseEntity<List<Order>> getClientOrders(){
+		List<Order> orders=orderService.getUserOrders();
+		if(!orders.isEmpty())
 			return new ResponseEntity<List<Order>>(orders,HttpStatus.OK);
-		}else return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 	@GetMapping("/{id}")
-	public ResponseEntity<Order> retrieveSingleOrder(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("id") long orderId ){
-		Optional<Order> order=orderService.getOrderById(userDetails,orderId);
+	public ResponseEntity<Order> retrieveSingleOrder(@PathVariable("id") long orderId ){
+		Optional<Order> order=orderService.getOrderById(orderId);
         return order.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
-	
+
 }

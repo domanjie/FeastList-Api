@@ -1,4 +1,4 @@
-package FeastList.menuItems;
+package FeastList.menuItem;
 
 import org.springframework.stereotype.Service;
 

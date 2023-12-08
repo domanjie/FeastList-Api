@@ -21,11 +21,11 @@ public class MealController {
 	}
 	@GetMapping("/{id}")
 	public Optional<Meal> meal (@PathVariable Long mealId){
-		return mealService.getMeal(mealId);
+		return mealService.getMealById(mealId);
 	}
 	@DeleteMapping("/{id}")
-	public Meal deleteMeal(@PathVariable Long mealId){
-		return mealService.deleteMeal(mealId);
+	public void deleteMeal(@PathVariable Long mealId){
+		 mealService.deleteMeal(mealId);
 	}
 	@GetMapping
 	public List<Meal> getMeals(){

@@ -1,17 +1,14 @@
 package FeastList.meals;
 
-import FeastList.menuItems.MenuItem;
-import FeastList.orders.Order;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.Map;
 import java.util.Set;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class Meal  {
 
@@ -29,8 +26,6 @@ public class Meal  {
 
 	private  String userId;
 
-	private Set<MealItemDto> mealItems;
-
-//	private  Map<Integer,Integer> mealItems;
+	private Set<MealItem> mealItems;
 
 }

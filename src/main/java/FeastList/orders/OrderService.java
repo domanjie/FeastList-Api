@@ -4,14 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import FeastList.users.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OrderService {
 
-	Order save(Order order, User user);
+	int save(Order order);
 
-	Optional<Order> getOrderById(UserDetails userDetails, Long orderId);
+	Optional<Order> getOrderById(Long orderId);
 
-	List<Order> getOrders(UserDetails userDetails);
-
+	List<Order> getUserOrders();
 }

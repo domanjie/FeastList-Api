@@ -73,6 +73,11 @@ public class AuthenticationServiceImpl implements AuthenticationService{
        return getTokens(authenticated);
     }
 
+    @Override
+    public String getAuthenticatedUserId() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
     private Map<String,String>  getTokens(Authentication authentication) throws JOSEException {
 
         Map<String,Object> accessTokenPayload=new HashMap<>();

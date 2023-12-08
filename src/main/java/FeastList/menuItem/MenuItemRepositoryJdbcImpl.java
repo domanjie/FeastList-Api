@@ -1,12 +1,9 @@
-package FeastList.menuItems;
+package FeastList.menuItem;
 
-import FeastList.users.User;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -95,7 +92,8 @@ public class MenuItemRepositoryJdbcImpl implements  MenuItemRepository {
                 rs.getString("name"),
                 rs.getDouble("price"),
                 rs.getString("vendor_id"),
-                rs.getString("avatar_url"),
-                rs.getTimestamp("date_added"));
+                rs.getTimestamp("date_added"),
+                rs.getString("avatar_url")
+            );
     }
 }

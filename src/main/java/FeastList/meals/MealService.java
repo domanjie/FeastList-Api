@@ -6,9 +6,9 @@ import java.util.Optional;
 public interface MealService {
 	int saveMeal(Meal meal);
 
-	Meal deleteMeal(Long mealId);
+	void deleteMeal(Long mealId);
 
-	Optional<Meal> getMeal(Long mealId);
+	Optional<Meal> getMealById(Long mealId);
 
 	List<Meal> getMeals();
 

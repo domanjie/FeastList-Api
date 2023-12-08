@@ -1,9 +1,9 @@
 package FeastList.tray;
 
 import FeastList.meals.Meal;
-import FeastList.meals.MealItemDto;
+import FeastList.meals.MealItem;
 import FeastList.meals.MealType;
-import FeastList.menuItems.MenuItem;
+import FeastList.menuItem.MenuItem;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -109,14 +109,14 @@ public class TrayRepositoryJdbcImpl implements TrayRepository {
                 };
 
                 if (meal.getMealType().equals(MealType.A_LA_CARTE)) {
-                    Set<MealItemDto> mealItems;
+                    Set<MealItem> mealItems;
                     if (meal.getMealItems() == null){
                         mealItems=new HashSet<>();
                     }else {
                         mealItems=new HashSet<>(meal.getMealItems());
                         meal.getMealItems().clear();
                     };
-                    var mealItem= new MealItemDto(
+                    var mealItem= new MealItem(
                             new MenuItem(
                                     resultSet.getInt("menu_item_id"),
                                     resultSet.getString("menu_item_name"),
