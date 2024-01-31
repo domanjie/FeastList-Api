@@ -95,7 +95,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
         return null;
     }
 
-    private void batchInsertClientMealItems(String SQLStatement, Set<MealItem> mealItems, int mealId) {
+    private void batchInsertClientMealItems(String SQLStatement, List<MealItem> mealItems, int mealId) {
         var batchParams=mealItems
 
 
@@ -105,7 +105,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
                     return new MapSqlParameterSource()
                             .addValue("mealId",mealId)
                             .addValue("menuItem", entry.menuItem().getId())
-                            .addValue("amount", entry.amount());
+                            .addValue("amount", entry.noOfPortion());
                 })
                 .toArray(MapSqlParameterSource[]::new);
 
@@ -125,7 +125,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
                     meal=new Meal(
                             id,
                             resultSet.getString("name"),
-                            resultSet.getDouble("price"),
+//                            resultSet.getDouble("price"),
                             resultSet.getTimestamp("date_added"),
                             MealType.valueOf(resultSet.getString("meal_type")),
                             resultSet.getString("avatar_url"),
@@ -155,7 +155,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
                             resultSet.getInt("amount")
                             );
                     mealItems.add(mealItem);
-                    meal.setMealItems(mealItems);
+                    meal.getMealItems().addAll(mealItems);
                 }
             }
             return new ArrayList<Meal>(objectMap.values());

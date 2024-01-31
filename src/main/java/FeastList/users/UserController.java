@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.web.bind.annotation.RequestMethod.*;
+
 @RestController
 @RequestMapping(path="/api/v1/rle",produces="application/json")
-@CrossOrigin(origins= "http://localhost:5173")
 public  class UserController {
     private final UserService userService;
 

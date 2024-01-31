@@ -1,6 +1,7 @@
 package FeastList.orders;
 
 import FeastList.meals.Meal;
+import FeastList.meals.MealRepository;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -14,8 +15,11 @@ import java.util.*;
 @Repository
 public class OrderRepositoryJdbcImpl implements OrderRepository{
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    public OrderRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate){
+
+    private final MealRepository mealRepository;
+    public OrderRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate ,MealRepository mealRepository){
         this.jdbcTemplate=jdbcTemplate;
+        this.mealRepository=mealRepository;
     }
 
     @Override
@@ -74,6 +78,11 @@ public class OrderRepositoryJdbcImpl implements OrderRepository{
     }
 
     @Override
+    public Order updateOrder(Order order) {
+        return null;
+    }
+
+    @Override
     public int saveOrder(Order order) {
         var insertIntoOrder= """
                 INSERT INTO  orders(client_id,runner_id,vendor_id,delivery_location,meals_cost,delivery_cost)
@@ -85,8 +94,8 @@ public class OrderRepositoryJdbcImpl implements OrderRepository{
                 .addValue("runnerId",order.getRunnerId())
                 .addValue("vendorId",order.getVendorId())
                 .addValue("deliveryLocation",order.getDeliveryLocation())
-                .addValue("deliveryCost",order.getOrderCost().deliveryCost())
-                .addValue("mealsCost",order.getOrderCost().mealsCost());
+                .addValue("deliveryCost",order.getDeliveryCost())
+                .addValue("mealsCost",order.getMealsCost());
 
         var keyHolder=new GeneratedKeyHolder();
 
@@ -108,7 +117,7 @@ public class OrderRepositoryJdbcImpl implements OrderRepository{
         var params=orderItems.stream()
                 .map(orderItem -> new MapSqlParameterSource()
                         .addValue(":orderId",orderId)
-                        .addValue("mealId",orderItem.mealId())
+                        .addValue("mealId",orderItem.meal().getId())
                         .addValue("mealAmount",orderItem.mealAmount()))
                 .toArray(MapSqlParameterSource[]::new);
         jdbcTemplate.batchUpdate(query,params);
@@ -128,9 +137,6 @@ public class OrderRepositoryJdbcImpl implements OrderRepository{
                             .clientId(rs.getString("client_id"))
                             .runnerId(rs.getString("runner_id"))
                             .vendorId(rs.getString("vendor_id"))
-                            .orderCost(new OrderCost(
-                                    rs.getDouble("meals_cost"),
-                                    rs.getDouble("deliver_cost")))
                             .orderItems(new ArrayList<>())
                             .deliveryLocation(rs.getString("delivery_location"))
                             .placedAt(rs.getTimestamp("placed_at"))
@@ -138,7 +144,7 @@ public class OrderRepositoryJdbcImpl implements OrderRepository{
                     orderMap.put(orderId,order);
                 }
                 order.getOrderItems().add(new OrderItem(
-                        rs.getInt("meal_id"),
+                        mealRepository.getMealById((long) rs.getInt("meal_id")).get() ,
                         rs.getInt("meal_amount")
                 ));
 

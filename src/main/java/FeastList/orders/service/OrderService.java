@@ -1,15 +1,16 @@
-package FeastList.orders;
+package FeastList.orders.service;
 
 import java.util.List;
 import java.util.Optional;
 
-import FeastList.users.User;
+import FeastList.orders.Order;
 
 public interface OrderService {
 
-	int save(Order order);
+	Order makeOrder(Order order);
 
 	Optional<Order> getOrderById(Long orderId);
 
 	List<Order> getUserOrders();
+	int saveOrder(Order order);
 }

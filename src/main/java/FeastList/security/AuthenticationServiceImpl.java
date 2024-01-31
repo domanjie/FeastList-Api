@@ -1,12 +1,15 @@
 package FeastList.security;
 
+import FeastList.security.jwt.JwtsProvider;
 import FeastList.security.jwt.JwtsTokenAuthentication;
 import FeastList.security.jwt.JwtsTokenService;
 import FeastList.security.jwt.JwtsTokenServiceImpl;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.Payload;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService{
@@ -23,7 +27,8 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     private  long ACCESS_TOKEN_EXPIRATION_TIME;
     @Value("${REFRESH_TOKEN_EXPIRATION_TIME}")
     private  long REFRESH_TOKEN_EXPIRATION_TIME;
-
+    @Autowired
+    private JwtsProvider provider;
     @Value("${REFRESH_TOKEN_SECRET}")
     private   String REFRESH_TOKEN_SECRET;
     @Value("${ACCESS_TOKEN_SECRET}")
@@ -66,10 +71,12 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     //get new set of tokens using refreshToken
     @Override
     public Map<String, String> refreshTokens(String refreshToken) throws JOSEException {
+        AuthenticationManager authenticationManager1=new ProviderManager(provider);
 
         JwtsTokenAuthentication unAuthenticated =new JwtsTokenAuthentication(refreshToken, JwtsTokenAuthentication.TokenType.REFRESH_TOKEN);
 
-       Authentication authenticated= authenticationManager.authenticate(unAuthenticated);
+       Authentication authenticated= authenticationManager1.authenticate(unAuthenticated);
+
        return getTokens(authenticated);
     }
 

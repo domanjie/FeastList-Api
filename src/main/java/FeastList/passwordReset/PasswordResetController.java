@@ -2,6 +2,7 @@ package FeastList.passwordReset;
 
 
 import FeastList.passwordReset.dto.PasswordResetDto;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class PasswordResetController {
         return passwordResetService.confirmResetCode(resetCode);
     }
     @GetMapping("/password/reset/{userId}")
-    public String  forgetPassword(@PathVariable("email") @NotBlank String email){
+    public String  forgetPassword(@PathVariable("userId") @NotBlank String email) throws MessagingException {
         return passwordResetService.forgetPassword(email);
     }
 }

@@ -20,6 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 import java.util.ArrayList;
@@ -34,7 +36,9 @@ public class SecurityConfig {
 
         return
                 http
-                    .authorizeHttpRequests()
+                        .cors()
+                        .and()
+                        .authorizeHttpRequests()
                         .requestMatchers("/api/v1/orders","/api/v1/orders/**","/api/v1/authentication","/api/v1/authentication/**","/").permitAll()
                         .anyRequest().authenticated()
                         .and()
@@ -74,6 +78,17 @@ public class SecurityConfig {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
+    }
+    @Bean
+    public WebMvcConfigurer corsConfiguration(){
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                        .allowCredentials(true)
+                        .allowedOrigins("http://localhost:5173");
+            }
+        };
     }
 
     @Bean

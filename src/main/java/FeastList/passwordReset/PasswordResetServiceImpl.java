@@ -1,9 +1,14 @@
 package FeastList.passwordReset;
 
+import FeastList.mailer.MailerService;
+import FeastList.mailer.MailerServiceImpl;
+import FeastList.meals.MealService;
 import FeastList.passwordReset.dto.PasswordResetDto;
+import FeastList.security.AuthenticationService;
 import FeastList.users.PasswordException;
 import FeastList.users.User;
 import FeastList.users.UserRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +22,18 @@ public class PasswordResetServiceImpl implements PasswordResetService{
 
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
+    private final MailerService mailerService;
+
+    private final AuthenticationService authenticationService;
     @Value("${RESET_PASSWORD_CODE_TTL}")
     private  long tokenDuration;
-    public PasswordResetServiceImpl (PasswordResetRepository passwordResetRepository , UserRepository userRepository)
+     PasswordResetServiceImpl (PasswordResetRepository passwordResetRepository , UserRepository userRepository,
+                                      MailerService mailerService,AuthenticationService authenticationService)
     {
         this.passwordResetRepository=passwordResetRepository;
         this.userRepository=userRepository;
+        this.mailerService=mailerService;
+        this.authenticationService=authenticationService;
     }
     @Override
     @Transactional
@@ -62,15 +73,18 @@ public class PasswordResetServiceImpl implements PasswordResetService{
 
     @Override
     @Transactional
-    public String forgetPassword(String email) {
+    public String forgetPassword(String email) throws MessagingException {
 
-        User user = userRepository.findById(email);
+
+        User user=userRepository.findById(email);
 
         String passwordResetCode = UUID.randomUUID().toString().substring(0, 7);
 
         PasswordReset passwordReset=new PasswordReset(passwordResetCode,getTTLMillis(),user);
 
         passwordResetRepository.save(passwordReset);
+
+        mailerService.sendPasswordResetEmail(passwordReset.getPasswordResetCode(),email);
 
         return " password reset code sent to" + email;
 

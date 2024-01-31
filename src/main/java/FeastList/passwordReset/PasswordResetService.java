@@ -2,6 +2,7 @@ package FeastList.passwordReset;
 
 
 import FeastList.passwordReset.dto.PasswordResetDto;
+import jakarta.mail.MessagingException;
 
 import java.util.Map;
 
@@ -11,5 +12,5 @@ public interface PasswordResetService {
 
     String resetPassword(PasswordResetDto passwordResetDto);
 
-    String forgetPassword(String email);
+    String forgetPassword(String userId) throws MessagingException;
 }

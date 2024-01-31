@@ -12,4 +12,6 @@ public interface OrderRepository {
     int saveOrder(Order order);
 
     List<Order> getOrdersByVendorId(String vendorId);
+
+    Order updateOrder(Order order);
 }

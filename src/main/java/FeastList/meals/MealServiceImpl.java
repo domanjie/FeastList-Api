@@ -20,8 +20,8 @@ public class MealServiceImpl implements MealService{
 
     @Override
     public int saveMeal(Meal meal) {
-        String presentUserId=authenticationService.getAuthenticatedUserId();
-        meal.setUserId(presentUserId);
+        String mealOwner=authenticationService.getAuthenticatedUserId();
+        meal.setUserId(mealOwner);
         return mealRepository.save(meal);
     }
 

@@ -13,7 +13,9 @@ import java.util.*;
 
 @Repository
 public class TrayRepositoryJdbcImpl implements TrayRepository {
+
     private final NamedParameterJdbcTemplate jdbcTemplate;
+
     public  TrayRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate=jdbcTemplate;
     }
@@ -28,6 +30,7 @@ public class TrayRepositoryJdbcImpl implements TrayRepository {
                 .addValue("userId",userId);
 
         jdbcTemplate.update(query,param);
+
     }
 
     @Override
@@ -96,7 +99,6 @@ public class TrayRepositoryJdbcImpl implements TrayRepository {
                         meal=new Meal(
                                 id,
                                 resultSet.getString("name"),
-                                resultSet.getDouble("price"),
                                 resultSet.getTimestamp("date_added"),
                                 MealType.valueOf(resultSet.getString("meal_type")),
                                 resultSet.getString("avatar_url"),
@@ -122,13 +124,13 @@ public class TrayRepositoryJdbcImpl implements TrayRepository {
                                     resultSet.getString("menu_item_name"),
                                     resultSet.getDouble("menu_item_ppp"),
                                     resultSet.getString("vendorId"),
-                                    resultSet.getString("menu_item_avatar_url"),
-                                    resultSet.getTimestamp("menu_item_date_added")
+                                    resultSet.getTimestamp("menu_item_date_added"),
+                                    resultSet.getString("menu_item_avatar_url")
                             ),
                             resultSet.getInt("amount")
                     );
                     mealItems.add(mealItem);
-                    meal.setMealItems(mealItems);
+                    meal.getMealItems().addAll(mealItems);
                 }
             }
             return new ArrayList<TrayItemDto>(objectMap.values());

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,8 +16,6 @@ public class Meal  {
 
 	private final String name;
 
-	private final double price;
-
 	public final Timestamp  dateAdded;
 
 	private final MealType mealType;
@@ -26,6 +24,11 @@ public class Meal  {
 
 	private  String userId;
 
-	private Set<MealItem> mealItems;
+	private final List<MealItem> mealItems;
 
+	public double getPrice(){
+		return mealItems.stream()
+				.mapToDouble(MealItem::getPrice)
+				.reduce(0,Double::sum);
+	};
 }

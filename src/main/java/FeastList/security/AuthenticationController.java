@@ -14,7 +14,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping(path="/api/v1/authentication" ,produces="application/json")
-@CrossOrigin(origins= "http://localhost:5173")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @Value("${REFRESH_TOKEN_EXPIRATION_TIME}")
@@ -60,26 +59,19 @@ public class AuthenticationController {
 
         tokens.put("accessToken",accessToken);
 
-        Cookie[] arrRefreshToken=getArrRefreshToken(request);
+        Cookie arrRefreshToken=getArrRefreshToken(request);
 
-        if (arrRefreshToken.length!=0){
+        tokens.put("refreshToken",arrRefreshToken.getValue());
 
-            var refreshToken=arrRefreshToken[0].getValue();
-
-            tokens.put("refreshToken",refreshToken);
-        }
 
         return tokens;
     }
 
     @GetMapping("/refresh")
     public String refreshTokens(HttpServletRequest request,HttpServletResponse response) throws JOSEException {
+        Cookie arrRefreshToken=getArrRefreshToken(request);
 
-        Cookie[] arrRefreshToken=getArrRefreshToken(request);
-        if(arrRefreshToken.length==0){
-            throw new JOSEException("refresh token must be present");
-        }
-        String refreshToken=arrRefreshToken[0].getValue();
+        String refreshToken=arrRefreshToken.getValue();
 
         Map<String,String> tokens= authenticationService.refreshTokens(refreshToken);
 
@@ -91,7 +83,6 @@ public class AuthenticationController {
         Cookie refreshTokenCookie  = buildResponseCookie(tokens.get("refreshToken"));
 
         response.addCookie(refreshTokenCookie);
-
         return tokens.get("accessToken");
     }
 
@@ -101,6 +92,8 @@ public class AuthenticationController {
 
         cookie.setHttpOnly(true);
 
+//        cookie.setSecure(false);
+
         int cookieTTL=(int)(new Date().getTime()+RT_COOKIE_EXPIRATION_TIME);
 
         cookie.setMaxAge(cookieTTL);
@@ -109,11 +102,13 @@ public class AuthenticationController {
 
     }
 
-    private static Cookie[] getArrRefreshToken(HttpServletRequest request){
-        return (Cookie[]) Arrays
-                .stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals("xid"))
-                .distinct().toArray();
+    private static Cookie getArrRefreshToken(HttpServletRequest request){
+
+        for(Cookie cookie:request.getCookies()){
+            if(cookie.getName().equals("xid"))return cookie;
+
+        }
+        throw new RuntimeException("run to the hostel");
     }
 
 }
