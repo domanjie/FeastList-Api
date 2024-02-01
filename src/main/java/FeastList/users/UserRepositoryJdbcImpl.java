@@ -1,15 +1,14 @@
 package FeastList.users;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.*;
+
 @Repository
 public class UserRepositoryJdbcImpl implements UserRepository{
-
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     public UserRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -24,7 +23,6 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                 :role , :isEnabled, :avatarUrl);
                 """;
         MapSqlParameterSource params=getUserMappedParams(user);
-
         jdbcTemplate.update(query1,params);
 
         String query2;
@@ -45,10 +43,11 @@ public class UserRepositoryJdbcImpl implements UserRepository{
         }
         jdbcTemplate.update(query2,extraParams);
         return user.getUserId();
+
     }
 
     @Override
-    public User findById(String userId) {
+    public Optional<User> findById(String userId) {
         String query= """
                 SELECT user_id , password , date_joined , phone_number,
                 location ,zip_code , role , is_enabled ,
@@ -61,7 +60,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                 """;
         MapSqlParameterSource params=new MapSqlParameterSource()
                 .addValue("userId",userId);
-        return jdbcTemplate.queryForObject(query,params,userRowMapper());
+        return Optional.ofNullable(jdbcTemplate.queryForObject(query,params,userRowMapper()));
 
     }
 
@@ -130,6 +129,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
     }
 
     private RowMapper<User> userRowMapper(){
+
         return (rs ,rowNum)->{
             return  User.builder()
                     .userId(rs.getString("user_id"))
@@ -137,7 +137,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                     .dateJoined(rs.getTimestamp("date_joined"))
                     .phoneNumber(rs.getString("phone_number"))
                     .location(rs.getString("location"))
-                    .zipCode(rs.getString("zip"))
+                    .zipCode(rs.getString("zip_code"))
                     .role(Role.valueOf(rs.getString("role")))
                     .isEnabled(rs.getBoolean("is_enabled"))
                     .avatarUrl(rs.getString("avatar_url"))

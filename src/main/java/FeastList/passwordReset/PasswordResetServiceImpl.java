@@ -5,6 +5,7 @@ import FeastList.mailer.MailerServiceImpl;
 import FeastList.meals.MealService;
 import FeastList.passwordReset.dto.PasswordResetDto;
 import FeastList.security.AuthenticationService;
+import FeastList.security.exceptions.UserNotFoundException;
 import FeastList.users.PasswordException;
 import FeastList.users.User;
 import FeastList.users.UserRepository;
@@ -76,7 +77,7 @@ public class PasswordResetServiceImpl implements PasswordResetService{
     public String forgetPassword(String email) throws MessagingException {
 
 
-        User user=userRepository.findById(email);
+        User user=userRepository.findById(email).orElseThrow(()->new UserNotFoundException(email+ "found"));
 
         String passwordResetCode = UUID.randomUUID().toString().substring(0, 7);
 

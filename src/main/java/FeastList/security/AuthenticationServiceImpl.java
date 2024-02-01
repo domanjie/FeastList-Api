@@ -46,7 +46,6 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
         this.jwtsTokenService = jwtsTokenService;
     }
-    //login users with username and password
     @Override
     public Map<String, String> loginPrincipal(LoginRequest loginRequest) throws JOSEException {
         UsernamePasswordAuthenticationToken token= UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),loginRequest.password());

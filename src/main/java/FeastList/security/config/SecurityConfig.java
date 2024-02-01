@@ -1,6 +1,8 @@
 package FeastList.security.config;
 
+import FeastList.security.exceptions.UserNotFoundException;
 import FeastList.security.jwt.JwtsTokenFilter;
+import FeastList.users.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -10,12 +12,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
@@ -23,14 +22,14 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private  final UserRepository userRepository;
+    public SecurityConfig(UserRepository userRepository){
+        this.userRepository=userRepository;
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,JwtsTokenFilter filter) throws Exception{
 
@@ -39,7 +38,11 @@ public class SecurityConfig {
                         .cors()
                         .and()
                         .authorizeHttpRequests()
-                        .requestMatchers("/api/v1/orders","/api/v1/orders/**","/api/v1/authentication","/api/v1/authentication/**","/").permitAll()
+                        .requestMatchers(
+                                "/api/v1/orders/**",
+                                "/api/v1/authentication/**",
+                                "/api/v1/rle/**")
+                        .permitAll()
                         .anyRequest().authenticated()
                         .and()
 //                        .oauth2Login(Customizer.withDefaults())
@@ -52,15 +55,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService(){
-        PasswordEncoder encoder=passwordEncoder();
-        List<UserDetails> usersList=new ArrayList<>();
-        usersList.add(new User("buzz",encoder.encode("password"),
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))));
-        usersList.add(new User("woody",encoder.encode("password"),
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))));
-
-        return  new InMemoryUserDetailsManager(usersList);
+    public UserDetailsService userDetailsService(){
+        return username -> {
+            return userRepository.findById(username)
+                    .orElseThrow(
+                    ()->new UserNotFoundException(username+ "not found"));
+        };
     }
     @Bean
     PasswordEncoder passwordEncoder() {

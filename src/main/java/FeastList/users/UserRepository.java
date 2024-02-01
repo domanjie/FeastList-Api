@@ -1,12 +1,13 @@
 package FeastList.users;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository {
 
     String saveUser(User user);
 
-    User findById(String s);
+    Optional<User> findById(String s);
 
     User findByActivationCode(String activationCode);
 

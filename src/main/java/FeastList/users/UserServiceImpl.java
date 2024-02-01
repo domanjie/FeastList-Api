@@ -1,11 +1,13 @@
 package FeastList.users;
 
+import FeastList.security.exceptions.UserNotFoundException;
 import FeastList.users.dto.PasswordUpgradeDto;
 import FeastList.users.dto.RunnerDto;
 import FeastList.users.dto.UserDto;
 import FeastList.users.dto.VendorDto;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +19,10 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-
-    public UserServiceImpl(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder=passwordEncoder;
     }
 
     @Override
@@ -27,7 +30,7 @@ public class UserServiceImpl implements UserService {
     	User user=User
     			.builder()
     			.userId(userDto.userId())
-    			.password(userDto.passwordConfirm())
+    			.password(passwordEncoder.encode(userDto.passwordConfirm()))
     			.gender(Gender.valueOf(userDto.gender()))
                 .isEnabled(false)
                 .role(Role.CLIENT)
@@ -57,7 +60,8 @@ public class UserServiceImpl implements UserService {
 
         String identity = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User user = userRepository.findById(identity);
+        User user = userRepository.findById(identity).orElseThrow(
+                ()->new UserNotFoundException("user:" +identity+" not found"));
 
         user.setPassword(passwordUpgradeDto.passwordConfirm());
 
@@ -70,9 +74,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(String userId) {
-
-        return userRepository.findById(userId);
-
+        return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("user:"+userId+" not-found"));
     }
 
 	@Override

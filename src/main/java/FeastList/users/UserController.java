@@ -43,7 +43,7 @@ public  class UserController {
 
     @PostMapping("/client")
     public String addProfile(@RequestBody @Valid UserDto userDto) {
-        System.err.println("domanjie e ddey happen for her");
+        System.out.println(userDto.toString());
         return userService.saveClient(userDto);
     }
 
