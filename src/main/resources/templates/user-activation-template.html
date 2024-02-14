@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet"   href="../static/user-activation-template-stylesheet.css">
+</head>
+<body>
+<img src="" alt="">
+<h3>Activate your FeastList Account</h3>
+<p>
+    To verify your email address, please use the following One Time Password (OTP):
+<span th:text="${activationCode}" th:remove="tag"></span>
+</p>
+<p>
+    Do not share this OTP with anyone. FeastList takes your account security very seriously. FeastList Customer Service will
+    never ask you to disclose or verify your FeastList password, OTP, credit card, or banking account number.
+    If you receive a suspicious email with a link to update your account information, do not click on the link—instead,
+    report the email to FeastList for investigation.
+</p>
+</body>
+</html>

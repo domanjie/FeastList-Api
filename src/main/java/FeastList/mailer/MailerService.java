@@ -2,6 +2,9 @@ package FeastList.mailer;
 
 import jakarta.mail.MessagingException;
 
+import java.util.Map;
+
 public interface MailerService {
-    void sendPasswordResetEmail(String resetCode, String userId) throws MessagingException;
+    void sendEmail( MailProps mailProps) ;
+    void sendSimpleEmail(String to, String body, String subject);
 }

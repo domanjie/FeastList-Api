@@ -64,12 +64,6 @@ public class UserRepositoryJdbcImpl implements UserRepository{
 
     }
 
-//    to implement later
-    @Override
-    public User findByActivationCode(String activationCode) {
-       return null;
-    }
-
 
     @Override
     public List<User> getUsersByRole(Role userRole) {
@@ -84,6 +78,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                 WHERE role=:userRole
                 ORDER BY user_id;
                 """;
+
         MapSqlParameterSource param=new MapSqlParameterSource()
                 .addValue(":userRole",userRole.toString());
         return jdbcTemplate.query(query,param,userRowMapper());

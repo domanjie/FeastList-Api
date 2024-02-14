@@ -9,8 +9,6 @@ public interface UserRepository {
 
     Optional<User> findById(String s);
 
-    User findByActivationCode(String activationCode);
-
     List<User> getUsersByRole(Role role);
 
     void updateUser(User user);

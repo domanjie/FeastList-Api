@@ -6,23 +6,26 @@ import FeastList.users.dto.RunnerDto;
 import FeastList.users.dto.UserDto;
 import FeastList.users.dto.VendorDto;
 
+import FeastList.users.userActivator.UserActivationService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserActivationService userActivationService;
     private final PasswordEncoder passwordEncoder;
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, UserActivationService userActivationService) {
         this.userRepository = userRepository;
         this.passwordEncoder=passwordEncoder;
+        this.userActivationService = userActivationService;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class UserServiceImpl implements UserService {
                 .isEnabled(false)
                 .role(Role.CLIENT)
     			.build();
-
+//        userActivationService.begin(user.getUserId());
         userRepository.saveUser(user);
 
         return "user created successfully";
@@ -44,14 +47,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String activateUser(String activationCode) {
-
-        User user = userRepository.findByActivationCode(activationCode);
-
+    public String activateUser(String ActivationCode) {
+        String userId   = userActivationService.confirmActivation(ActivationCode);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user=optionalUser.orElseThrow(()->new UserNotFoundException(userId+" not found"));
         user.setEnabled(true);
-
         userRepository.updateUser(user);
-
         return "user activated successfully";
     }
 

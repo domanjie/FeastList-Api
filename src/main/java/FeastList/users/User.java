@@ -32,6 +32,7 @@ public class User implements UserDetails{
 	private String lastName;
 	private Gender gender;
 
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Collections.singleton(new SimpleGrantedAuthority(role.toString()));
@@ -48,12 +49,14 @@ public class User implements UserDetails{
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return isEnabled;
+		return true;
 	}
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
-
-
+	@Override
+	public boolean isEnabled(){
+		return true;
+	}
 }

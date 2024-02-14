@@ -16,11 +16,11 @@ public class MealController {
 	}
 	@PostMapping(consumes="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public int Meal(@RequestBody Meal meal){
+	public int saveMeal(@RequestBody Meal meal){
 		return mealService.saveMeal(meal);
 	}
 	@GetMapping("/{id}")
-	public Optional<Meal> meal (@PathVariable Long mealId){
+	public Optional<Meal> getMeal (@PathVariable Long mealId){
 		return mealService.getMealById(mealId);
 	}
 	@DeleteMapping("/{id}")

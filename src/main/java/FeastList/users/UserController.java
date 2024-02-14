@@ -42,12 +42,13 @@ public  class UserController {
     }
 
     @PostMapping("/client")
+    @ResponseStatus(HttpStatus.CREATED)
     public String addProfile(@RequestBody @Valid UserDto userDto) {
         System.out.println(userDto.toString());
         return userService.saveClient(userDto);
     }
 
-    @PostMapping("/profile/actUser")
+    @PostMapping("/profile/activate-user")
     public String profileActivationCode(@RequestBody @NotBlank String activationCode) {
         return userService.activateUser(activationCode);
     }

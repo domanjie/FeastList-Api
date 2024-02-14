@@ -1,5 +1,6 @@
 package FeastList.passwordReset;
 
+import FeastList.mailer.MailProps;
 import FeastList.mailer.MailerService;
 import FeastList.mailer.MailerServiceImpl;
 import FeastList.meals.MealService;
@@ -24,8 +25,6 @@ public class PasswordResetServiceImpl implements PasswordResetService{
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
     private final MailerService mailerService;
-
-    private final AuthenticationService authenticationService;
     @Value("${RESET_PASSWORD_CODE_TTL}")
     private  long tokenDuration;
      PasswordResetServiceImpl (PasswordResetRepository passwordResetRepository , UserRepository userRepository,
@@ -34,7 +33,6 @@ public class PasswordResetServiceImpl implements PasswordResetService{
         this.passwordResetRepository=passwordResetRepository;
         this.userRepository=userRepository;
         this.mailerService=mailerService;
-        this.authenticationService=authenticationService;
     }
     @Override
     @Transactional
@@ -79,20 +77,28 @@ public class PasswordResetServiceImpl implements PasswordResetService{
 
         User user=userRepository.findById(email).orElseThrow(()->new UserNotFoundException(email+ "found"));
 
-        String passwordResetCode = UUID.randomUUID().toString().substring(0, 7);
+        String passwordResetCode = UUID.randomUUID().toString().substring(0, 6);
 
         PasswordReset passwordReset=new PasswordReset(passwordResetCode,getTTLMillis(),user);
 
         passwordResetRepository.save(passwordReset);
 
-        mailerService.sendPasswordResetEmail(passwordReset.getPasswordResetCode(),email);
+        var templateAttributes=new HashMap<String,Object>();
+        templateAttributes.put("userId",user.getUserId());
+        templateAttributes.put("resetCode",passwordReset.getPasswordResetCode());
+        MailProps mailProps=MailProps
+                .builder()
+                .to(user.getUserId())
+                .subject("password-reset-template")
+                .templateAttributes(templateAttributes).build();
 
+        mailerService.sendEmail(mailProps);
         return " password reset code sent to" + email;
 
     }
     public long getTTLMillis()
     {
-        return new Date().getTime()+tokenDuration;
+        return new Date().getTime()+(tokenDuration*1000);
     }
     public void validateResetCode(PasswordReset passwordReset) {
         if(!passwordReset.isValid()){
