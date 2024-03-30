@@ -1,4 +1,4 @@
-package FeastList.users;
+package FeastList.users.domain;
 
 public enum Role {
     RUNNER,

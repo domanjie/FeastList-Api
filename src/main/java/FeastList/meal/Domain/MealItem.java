@@ -1,4 +1,4 @@
-package FeastList.meals;
+package FeastList.meal;
 
 import FeastList.menuItem.MenuItem;
 

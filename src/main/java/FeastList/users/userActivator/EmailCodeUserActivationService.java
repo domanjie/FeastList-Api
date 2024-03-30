@@ -27,14 +27,14 @@ public class EmailCodeUserActivationService implements UserActivationService {
         var ttl=new Date().getTime()+ token_duration*1000;
         var activation=new Activation( userId,UUID.randomUUID().toString().substring(0, 6),ttl);
         var templateAttributes=new HashMap<String,Object>();
-        templateAttributes.put("activationCode",activation.ActivationCode());
+        templateAttributes.put("activationCode",activation.getActivationCode());
         var mailProps=new MailProps(
                 userId,
                 "Activate Your Account",
                 "user-activation-template",
                 templateAttributes);
         mailerService.sendEmail(mailProps);
-        activationRepo.SaveActivation(activation);
+        activationRepo.save(activation);
 
     }
 
@@ -42,14 +42,11 @@ public class EmailCodeUserActivationService implements UserActivationService {
     @Transactional
     public String confirmActivation(String code) {
         Activation activation= activationRepo.getByActivationCode(code).orElseThrow(()->new ActivationException("Invalid Activation Code") );
-        return validateActivation(activation);
-    }
-    private String  validateActivation(Activation activation){
-        var validDuration =new Date(activation.ttl());
-        if(new Date().after(validDuration)){
-            throw new ActivationException("activation code expired");
+        if(!activation.isValid()){
+            activationRepo.deleteById(activation.getUserId());
+            throw new ActivationException("expired activation code");
         };
-        return activation.userId();
+        return activation.getUserId();
+    }
 
-    };
 }
