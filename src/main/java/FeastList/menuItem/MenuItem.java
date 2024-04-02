@@ -1,26 +1,39 @@
 package FeastList.menuItem;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
-@Builder
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
+@Entity
+@Setter
+@Getter
+@Table(name = "menu_items")
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class MenuItem {
 
-	private final int  id;
+	@Column(name = "id")
+	@Id
+	private  UUID id;
 
+	@Column(name = "name")
 	private final String name;
 
+	@Column(name = "price_per_portion")
 	private final double pricePerPortion;
 
+	@Column(name = "vendor_name")
 	private final String vendorId;
 
-	private final Timestamp date_added;
+	@Column(name = "date_added")
+	private final Timestamp dateAdded;
 
+	@Column(name = "avatar_url")
 	private final String avatarUrl;
 }

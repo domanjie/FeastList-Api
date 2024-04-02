@@ -1,9 +1,11 @@
 package FeastList.menuItem;
 
+import com.github.f4b6a3.ulid.UlidCreator;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class MenuItemServiceImpl implements MenuItemService{
     private final MenuItemRepository menuItemRepo;
@@ -11,27 +13,17 @@ public class MenuItemServiceImpl implements MenuItemService{
         this.menuItemRepo=menuItemRepo;
     }
     @Override
-    public int saveRestaurantMenuItem( MenuItem menuItem) {
-        return menuItemRepo.saveMenuItem(menuItem);
+    public String saveVendorMenuItem( MenuItem menuItem) {
+        System.err.println(menuItem);
+        menuItem.setId(UlidCreator.getUlid().toUuid());
+        System.err.println(menuItem);
+        menuItemRepo.save(menuItem);
+        return "Menu item saved successfully";
     }
 
     @Override
-    public Optional<MenuItem> getMenuItemById(int itemId) {
-        return menuItemRepo.getMenuItemById(itemId);
+    public Optional<MenuItem> getMenuItemById(UUID itemId) {
+        return menuItemRepo.findById(itemId);
     }
 
-    @Override
-    public List<MenuItem> getMenuItemsByVendor(String vendorId) {
-        return menuItemRepo.getByVendor(vendorId);
-    }
-
-    @Override
-    public void updateRestaurantMenuItem( MenuItem menuItem, long id) {
-         menuItemRepo.updateMenuItem(menuItem, id);
-    }
-
-    @Override
-    public void deleteRestaurantMenuItem(long itemId) {
-         menuItemRepo.deleteMenuItem(itemId);
-    }
 }

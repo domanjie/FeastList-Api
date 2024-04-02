@@ -2,16 +2,12 @@ package FeastList.menuItem;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MenuItemRepository {
 
-    int saveMenuItem(MenuItem menuItem);
+    MenuItem save(MenuItem menuItem);
 
-    Optional<MenuItem> getMenuItemById(int itemId);
+    Optional<MenuItem> findById(UUID itemId);
 
-    List<MenuItem> getByVendor(String restaurantId);
-
-    void updateMenuItem(MenuItem menuItem, long id);
-
-    void deleteMenuItem(long itemId);
 }

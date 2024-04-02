@@ -2,17 +2,12 @@ package FeastList.menuItem;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MenuItemService {
 
-	int saveRestaurantMenuItem( MenuItem menuItem);
+	String saveVendorMenuItem( MenuItem menuItem);
 	
-	Optional<MenuItem> getMenuItemById(int itemId);
-
-	List<MenuItem> getMenuItemsByVendor(String vendorId);
-
-	void updateRestaurantMenuItem(MenuItem menuItem, long id);
-
-	void deleteRestaurantMenuItem( long ItemId);
+	Optional<MenuItem> getMenuItemById(UUID itemId);
 
 }
