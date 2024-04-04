@@ -1,9 +1,9 @@
-package FeastList.users.domain.meal;
-import FeastList.meals.domain.*;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public class MealRepositoryJdbcImpl implements MealRepository {
+//package FeastList.meal;
+//import FeastList.meals.domain.*;
+//import org.springframework.stereotype.Repository;
+//
+//@Repository
+//public class MealRepositoryJdbcImpl implements MealRepository {
 //    private final NamedParameterJdbcTemplate jdbcTemplate;
 //
 //    public MealRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate){
@@ -12,12 +12,12 @@ public class MealRepositoryJdbcImpl implements MealRepository {
 //
 //    @Override
 //    public int save(Meal meal) {
-//        if(meal instanceof PreMadeMeal)
-//            return save((PreMadeMeal) meal);
+//        if(meal instanceof PreMadeMealService)
+//            return save((PreMadeMealService) meal);
 //        else
-//            return  save((ALaCarteMeal) meal);
+//            return  save((CustomMeal) meal);
 //    }
-//    private int save(PreMadeMeal meal) {
+//    private int save(PreMadeMealService meal) {
 //        var query= """
 //                INSERT INTO meals(name,price,user_id,meal_type,avatar_url)
 //                VALUES (:name,:price,:userId,:mealType,:avatarUrl)
@@ -34,7 +34,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
 //        return mealId;
 //    }
 //
-//    private int save(ALaCarteMeal meal) {
+//    private int save(CustomMeal meal) {
 //        var query= """
 //                INSERT INTO meals(name,price,user_id,meal_type)
 //                VALUES (:name,:price,:userId,:mealType)
@@ -144,7 +144,7 @@ public class MealRepositoryJdbcImpl implements MealRepository {
 //                if (!isPreMade(Objects.requireNonNull(meal))) {
 //
 //                    var mealItem=buildMealITem(resultSet);
-//                    ((ALaCarteMeal)meal).getMealItems().add(mealItem);
+//                    ((CustomMeal)meal).getMealItems().add(mealItem);
 //                }
 //            }
 //            return new ArrayList<Meal>(objectMap.values());
@@ -167,8 +167,8 @@ public class MealRepositoryJdbcImpl implements MealRepository {
 //                resultSet.getInt("amount")
 //        );
 //    }
-//    private ALaCarteMeal buildALaCarteMeal(ResultSet resultSet) throws SQLException {
-////        return new ALaCarteMeal(
+//    private CustomMeal buildALaCarteMeal(ResultSet resultSet) throws SQLException {
+////        return new CustomMeal(
 ////                resultSet.getInt("id"),
 ////                resultSet.getString("name"),
 ////                resultSet.getString("user_id"),
@@ -177,8 +177,8 @@ public class MealRepositoryJdbcImpl implements MealRepository {
 ////        );
 //        return null;
 //    }
-//    private PreMadeMeal buildPreMadeMeal(ResultSet resultSet) throws SQLException {
-//        return new PreMadeMeal(
+//    private PreMadeMealService buildPreMadeMeal(ResultSet resultSet) throws SQLException {
+//        return new PreMadeMealService(
 //                resultSet.getInt("id"),
 //                resultSet.getString("name"),
 //                resultSet.getString("user_id"),
