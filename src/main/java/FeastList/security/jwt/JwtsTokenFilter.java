@@ -33,13 +33,14 @@ public class JwtsTokenFilter extends OncePerRequestFilter {
         if (!headers.contains(AUTH_HEADER) )
         {
             filterChain.doFilter(request,response);
+            System.out.println("i was called oo");
             return;
         }
         String authorizationValue =request.getHeader(AUTH_HEADER);
 
         String accessToken=authorizationValue.substring(7);
 
-        Authentication unAuthenticatedToken       =new JwtsTokenAuthentication(accessToken, JwtsTokenAuthentication.TokenType.ACCESS_TOKEN);
+        Authentication unAuthenticatedToken =new JwtsTokenAuthentication(accessToken, JwtsTokenAuthentication.TokenType.ACCESS_TOKEN);
 
         Authentication authenticatedToken= authenticationManager.authenticate(unAuthenticatedToken);
 
@@ -50,7 +51,5 @@ public class JwtsTokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(context);
 
         filterChain.doFilter(request,response);
-
-        return;
     }
 }

@@ -80,8 +80,8 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     }
 
     @Override
-    public String getAuthenticatedUserId() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+    public Authentication getAuthenticatedUser() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     private Map<String,String>  getTokens(Authentication authentication) throws JOSEException {

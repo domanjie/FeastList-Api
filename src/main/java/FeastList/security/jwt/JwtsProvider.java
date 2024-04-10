@@ -2,6 +2,7 @@ package FeastList.security.jwt;
 
 import com.nimbusds.jose.JOSEException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -36,15 +37,14 @@ public class JwtsProvider implements AuthenticationProvider {
         Optional<Map<String,Object>> optionalTokenPayload;
         try {
             optionalTokenPayload= jwtsTokenService.verifyToken(token,secret);
-        } catch (ParseException | JOSEException e) {
+        } catch (ParseException | JOSEException e) {;
             throw new RuntimeException(e);
         }
-
-        return  optionalTokenPayload.map(payload->{
-
-            return new JwtsTokenAuthentication((String) payload.get("username"),(String)payload.get("role"),unAuthenticated.getTokenType());
-
-        }).orElse(null);
+        return  optionalTokenPayload.map(payload->
+                new JwtsTokenAuthentication((String) payload.get("username"),
+                        (String)payload.get("role"),
+                        unAuthenticated.getTokenType()))
+                .orElseThrow(()->new  AccessDeniedException("ACCESS DENIED"));
     }
 
     private  String getSecret(JwtsTokenAuthentication.TokenType tokenType) {

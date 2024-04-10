@@ -1,6 +1,7 @@
 package FeastList.security;
 
 import com.nimbusds.jose.JOSEException;
+import org.springframework.security.core.Authentication;
 
 import java.util.Map;
 
@@ -12,5 +13,5 @@ public interface AuthenticationService {
 
     Map<String, String> refreshTokens(String refreshToken) throws JOSEException;
 
-    String getAuthenticatedUserId();
+    Authentication getAuthenticatedUser();
 }
