@@ -1,13 +1,11 @@
 package FeastList.tray;
 
-import FeastList.meals.Meal;
+import java.util.UUID;
 
 public interface TrayService {
     String clearTray();
 
-    void addToTray(TrayItemDto trayItemDto);
+    String addToTray(TrayItemDto trayItemDto);
 
-    Tray getTray();
-
-    void deleteFromTray(Long id);
+    String deleteFromTray(UUID mealId);
 }

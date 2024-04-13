@@ -1,7 +1,8 @@
 package FeastList.tray;
 
-import FeastList.meals.Meal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "api/v1/tray")
@@ -10,23 +11,17 @@ public class TrayController {
     public TrayController(TrayService trayService) {
         this.trayService=trayService;
     }
-
-    @GetMapping
-    public Tray getTray() {
-        return trayService.getTray();
-    }
-
-    @PatchMapping(path="/clear")
+    @DeleteMapping
     public String clearTray(){
       return  trayService.clearTray();
     }
     @PostMapping
-    public void addToTray(@RequestBody TrayItemDto trayItemDto){
-        trayService.addToTray(trayItemDto);
+    public String addToTray(@RequestBody TrayItemDto trayItemDto) {
+        return trayService.addToTray(trayItemDto);
     }
-    @DeleteMapping(path = "/delete/{id}")
-    public void deleteFromTray(@PathVariable("id") Long id){
-        trayService.deleteFromTray(id);
+    @DeleteMapping(path = "/{id}")
+    public void deleteFromTray(@PathVariable("id") String  mealId){
+        trayService.deleteFromTray(UUID.fromString(mealId));
     }
 
 }

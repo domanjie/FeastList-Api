@@ -1,9 +1,9 @@
 package FeastList.tray;
 
-import FeastList.meals.Meal;
+import FeastList.meal.domain.Meal;
 
-import java.util.List;
+import java.util.UUID;
 
-public record TrayItemDto(Meal meal,int amount) {
+public record TrayItemDto(String mealId, int amount) {
 
 }

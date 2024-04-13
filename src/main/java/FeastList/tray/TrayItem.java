@@ -1,21 +1,33 @@
 package FeastList.tray;
 
-import FeastList.meal.domain.Meal;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.util.Map;
+import java.util.UUID;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Table(name="tray")
-public class Tray {
-    @Id
-    private final String trayOwner;
+@ToString
+@Builder
+@EqualsAndHashCode
+public class TrayItem {
 
-    private final Map<Meal,Integer> trayItems ;
+    @EmbeddedId
+    private final TrayItemId trayItemId;
+    private  int amount;
 
+    @Embeddable
+    @AllArgsConstructor
+    @NoArgsConstructor(force = true)
+    @EqualsAndHashCode
+    @ToString
+    public static class TrayItemId {
+
+        private final String clientId;
+
+        @Column(columnDefinition = "UUID")
+        private final UUID mealId;
+    }
 }
