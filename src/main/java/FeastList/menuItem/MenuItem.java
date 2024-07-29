@@ -1,5 +1,6 @@
 package FeastList.menuItem;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -18,15 +19,15 @@ import lombok.*;
 @AllArgsConstructor
 public class MenuItem {
 
-	@Column(name = "id")
+	@Column(name = "id", columnDefinition = "UUID")
 	@Id
 	private  UUID id;
 
 	@Column(name = "name")
 	private final String name;
 
-	@Column(name = "price_per_portion")
-	private final double pricePerPortion;
+	@Column(name = "price_per_portion" ,columnDefinition = "decimal(10,2)")
+	private final float pricePerPortion;
 
 	@Column(name = "vendor_name")
 	private final String vendorId;

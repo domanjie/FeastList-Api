@@ -1,5 +1,8 @@
 package FeastList.payment;
 
-public interface PaymentService {
-    void makePayment(double totalCost,PaymentMethod method);
+public class PaymentService {
+
+    public boolean makePaymentWithCreditCard(double totalCost, CreditCardPaymentDetails creditCardPaymentDetails) {
+        return false;
+    }
 }

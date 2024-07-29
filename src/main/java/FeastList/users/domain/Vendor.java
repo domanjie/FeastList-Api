@@ -3,6 +3,7 @@ package FeastList.users.domain;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +17,7 @@ import java.util.Collections;
 @Entity
 @PrimaryKeyJoinColumn(name = "vendor_name")
 @Table(name ="vendors")
+@NoArgsConstructor(force = true)
 public class Vendor extends User{
     @Column(name = "email")
     private final String email;

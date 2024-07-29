@@ -1,8 +1,10 @@
 package FeastList.security.config;
 
 import FeastList.security.exceptions.UserNotFoundException;
+import FeastList.security.jwt.JwtsProvider;
 import FeastList.security.jwt.JwtsTokenFilter;
 import FeastList.users.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -31,10 +33,15 @@ public class SecurityConfig {
         this.userRepository=userRepository;
     }
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,JwtsTokenFilter filter) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http,AuthenticationManager authenticationManager) throws Exception{
 
         return
                 http
+                        .exceptionHandling()
+                        .authenticationEntryPoint(
+                                (req,res,e)->{res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                                })
+                        .and()
                         .cors()
                         .and()
                         .authorizeHttpRequests()
@@ -45,12 +52,10 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated()
                         .and()
-//                        .oauth2Login(Customizer.withDefaults())
-                        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
                         .and()
                         .csrf().disable()
-                        .addFilterBefore(filter,UsernamePasswordAuthenticationFilter.class)
-//                        .oauth2Login(oauth2->oauth2.authorizationEndpoint(endpoint->{endpoint.baseUri("/oauth2/authorize");}))
+                        .addFilterBefore(new JwtsTokenFilter(authenticationManager),UsernamePasswordAuthenticationFilter.class)
                         .build();
     }
 
@@ -67,8 +72,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http)throws Exception{
-        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+    public AuthenticationManager authenticationManager(JwtsProvider jwtsProvider, HttpSecurity http)throws Exception{
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(jwtsProvider)
+                .getOrBuild();
     }
 
     @Bean
@@ -79,6 +86,8 @@ public class SecurityConfig {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
+
+
     @Bean
     public WebMvcConfigurer corsConfiguration(){
         return new WebMvcConfigurer() {
@@ -86,14 +95,14 @@ public class SecurityConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                         .allowCredentials(true)
-                        .allowedOrigins("http://localhost:5173");
+                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:5173"," http://192.168.43.85:5173");
             }
         };
     }
 
     @Bean
-    public LogoutHandler logoutHandler()
-    {
+    public LogoutHandler logoutHandler(){
         return new CookieClearingLogoutHandler("xid");
     }
 }

@@ -1,56 +1,58 @@
 package FeastList.orders.service.impl;
 
 import FeastList.delivery.DeliveryService;
-import FeastList.orders.Order;
+import FeastList.meal.domain.Meal;
+import FeastList.meal.repository.JpaMealRepository;
 import FeastList.orders.OrderRepository;
-import FeastList.orders.OrderStatus;
+import FeastList.orders.domain.Order;
+import FeastList.orders.domain.OrderItemDetails;
+import FeastList.orders.dto.in.OrderDto;
 import FeastList.orders.service.OrderService;
 import FeastList.payment.PaymentService;
-import FeastList.security.AuthenticationService;
+import com.github.f4b6a3.ulid.UlidCreator;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.HashMap;
+
 @Service
 public class OrderServiceImpl  implements OrderService {
+
     private final OrderRepository orderRepository;
-    private final AuthenticationService authenticationService;
 
     private final DeliveryService deliveryService;
 
+    private final JpaMealRepository mealRepository;
+
     private final PaymentService paymentService;
-    private OrderServiceImpl(OrderRepository orderRepository,
-                             AuthenticationService authenticationService,
-                             DeliveryService deliveryService,PaymentService paymentService){
-        this.authenticationService=authenticationService;
+    private OrderServiceImpl(
+            OrderRepository orderRepository,
+                             DeliveryService deliveryService,JpaMealRepository mealRepository){
         this.orderRepository=orderRepository;
         this.deliveryService=deliveryService;
-        this.paymentService=paymentService;
+        this.paymentService=new PaymentService();
+        this.mealRepository=mealRepository;
     }
 
     @Override
-    public int saveOrder(Order order) {
+    public String processNewOrder(OrderDto orderDto) {
 
-        return orderRepository.saveOrder(order);
-    }
-
-    @Override
-    public Order makeOrder(Order order) {
-        deliveryService.determineDeliveryCost(order);
-        paymentService.makePayment(order.getTotalCost(),order.getPaymentMethod());
-        order.setOrderStatus(OrderStatus.PENDING_DELIVERY);
-
-        return orderRepository.updateOrder(order);
-    }
-
-    @Override
-    public Optional<Order> getOrderById(Long orderId){
-        return orderRepository.getOrderById(orderId);
-    }
-
-    @Override
-    public List<Order> getUserOrders() {
-        String userId = authenticationService.getAuthenticatedUserId();
-        return orderRepository.getOrdersByClientId(userId);
+        var client= SecurityContextHolder.getContext().getAuthentication().getName();
+        var meals=mealRepository.findAllById(orderDto.orderItems().keySet());
+        var mealAndDetails=new HashMap<Meal, OrderItemDetails>();
+        for(Meal meal:meals){
+                var detail=orderDto.orderItems().get(meal.getId());
+                mealAndDetails.put(meal,detail);
+        }
+        var  order=Order.builder().id(UlidCreator.getUlid().toUuid())
+                .clientId(client)
+                .deliveryLocation(orderDto.Location())
+                .mealAndDetails(mealAndDetails)
+                .build();
+        boolean paymentSuccessful=paymentService.makePaymentWithCreditCard(order.getTotalOrderCost(),orderDto.creditCardPaymentDetails());
+        if(paymentSuccessful){
+            orderRepository.save(order);
+        };
+        return "order created Successfully";
     }
 }

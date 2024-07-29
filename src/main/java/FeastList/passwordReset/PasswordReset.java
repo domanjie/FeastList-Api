@@ -1,22 +1,34 @@
 package FeastList.passwordReset;
 
-import FeastList.users.User;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import FeastList.users.domain.User;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
 
 import java.util.Date;
+import java.util.UUID;
 
-@Data
-@Builder
+@Entity
+@Table(name = "password_reset")
+@NoArgsConstructor(access = AccessLevel.PACKAGE  ,force = true)
+@AllArgsConstructor
+@Getter
 public class PasswordReset {
-    private final String passwordResetCode;
 
-    private final long TTL;
+    @Id
+    @Column(name = "user_id")
+    private  final String userId;
 
-    private  final User user;
+    @Column(name="reset_code" ,columnDefinition = "UUID")
+    private final UUID passwordResetCode;
+
+    @Column(name="ttl")
+    private final long ttl;
+
 
     public boolean isValid() {
-        return new Date().before(new Date(TTL));
+        return new Date().before(new Date(ttl));
     }
 }

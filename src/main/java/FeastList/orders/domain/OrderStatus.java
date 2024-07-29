@@ -1,7 +1,6 @@
-package FeastList.orders;
+package FeastList.orders.domain;
 
 public enum OrderStatus {
-    PENDING_ACCEPTANCE,
     PENDING_DELIVERY,
     DELIVERED
 }

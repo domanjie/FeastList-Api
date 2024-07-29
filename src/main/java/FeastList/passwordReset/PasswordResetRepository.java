@@ -1,9 +1,11 @@
 package FeastList.passwordReset;
 
+import java.util.Optional;
+
 public interface PasswordResetRepository {
-    void delete(String resetCode);
+    void deleteById(String resetCode);
 
-    void save(PasswordReset passwordReset);
+    PasswordReset save(PasswordReset passwordReset);
 
-    PasswordReset findByResetCode(String resetCode);
+    Optional<PasswordReset> findByPasswordResetCode(String resetCode);
 }

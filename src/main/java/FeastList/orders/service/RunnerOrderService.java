@@ -1,6 +1,6 @@
 package FeastList.orders.service;
 
-import FeastList.orders.Order;
+import FeastList.orders.domain.Order;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;

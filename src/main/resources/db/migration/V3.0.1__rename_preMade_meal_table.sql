@@ -1,0 +1,1 @@
+RENAME TABLE preMade_meal to pre_made_meal;

@@ -18,22 +18,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-@Component
 public class JwtsTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtsProvider provider;
+    private AuthenticationManager authenticationManager;
+
+    public JwtsTokenFilter(AuthenticationManager authenticationManager){
+        this.authenticationManager=authenticationManager;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException,IOException {
 
-        AuthenticationManager authenticationManager=new ProviderManager(provider);
         String AUTH_HEADER = "authorization";
         ArrayList<String> headers=Collections.list(request.getHeaderNames());
+        System.out.println(headers);
         if (!headers.contains(AUTH_HEADER) )
         {
             filterChain.doFilter(request,response);
-            System.out.println("i was called oo");
             return;
         }
         String authorizationValue =request.getHeader(AUTH_HEADER);

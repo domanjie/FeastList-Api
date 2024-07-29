@@ -1,7 +1,7 @@
 package FeastList.users.controllers;
 
-import FeastList.users.domain.User;
 import FeastList.users.dto.ClientDto;
+import FeastList.users.dto.MiniVendorProjection;
 import FeastList.users.dto.VendorDto;
 import FeastList.users.service.contracts.ClientService;
 import FeastList.users.service.contracts.UserService;
@@ -10,6 +10,8 @@ import FeastList.users.service.contracts.VendorService;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path="/api/v1/rle",produces="application/json")
@@ -46,6 +48,10 @@ public  class UserController {
         return vendorService.addNewVendor(vendorDto);
     }
 
+    @GetMapping(path="/vendors")
+    public List<MiniVendorProjection> fetchVendors(@RequestParam("sort") String sort){
+        return vendorService.fetchVendors(sort);
+    }
 }
 
 

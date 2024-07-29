@@ -40,7 +40,7 @@ import java.util.Collections;
 
     @Override
     public Object getCredentials() {
-        return null;
+        return token;
     }
 
     @Override

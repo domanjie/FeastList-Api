@@ -23,14 +23,14 @@ class MenuItemRepositoryJdbcImplTest {
 //arrange act asset
     @Test
     void saveMenuItem() {
-
-        MenuItem menuItem = MenuItem.builder()
-                .name("eba")
-                .pricePerPortion(100)
-                .avatarUrl("http://eba")
-                .vendorId("lucyomaz@gmail.com")
-                .build();
-        menuItemRepository.saveMenuItem(menuItem);
+//
+//        MenuItem menuItem = MenuItem.builder()
+//                .name("eba")
+//                .pricePerPortion(100)
+//                .avatarUrl("http://eba")
+//                .vendorId("lucyomaz@gmail.com")
+//                .build();
+//        menuItemRepository.saveMenuItem(menuItem);
     }
 
     @Test

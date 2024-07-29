@@ -7,6 +7,7 @@ import FeastList.users.domain.Client;
 import FeastList.users.domain.User;
 import FeastList.users.domain.Vendor;
 import FeastList.users.dto.ClientDto;
+import FeastList.users.dto.MiniVendorProjection;
 import FeastList.users.dto.PasswordChangeDto;
 
 import FeastList.users.dto.VendorDto;
@@ -14,10 +15,12 @@ import FeastList.users.service.contracts.ClientService;
 import FeastList.users.service.contracts.UserService;
 import FeastList.users.service.contracts.VendorService;
 import FeastList.users.userActivator.UserActivationService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,14 +28,12 @@ public class UserServiceImpl implements UserService , VendorService, ClientServi
     private final UserRepository userRepository;
     private final UserActivationService userActivationService;
 
-    private final AuthenticationService authenticationService;
     private final PasswordEncoder passwordEncoder;
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
                            UserActivationService userActivationService,AuthenticationService authenticationService) {
         this.userRepository = userRepository;
         this.passwordEncoder=passwordEncoder;
         this.userActivationService = userActivationService;
-        this.authenticationService=authenticationService;
     }
 
 
@@ -50,8 +51,8 @@ public class UserServiceImpl implements UserService , VendorService, ClientServi
     @Override
     @Transactional
     public String updatePassword(PasswordChangeDto passwordChangeDto) {
-
-        User user = userRepository.findById(authenticationService.getAuthenticatedUserId()).get();
+        var userId= SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findById(userId).get();
 
         user.changePassword(passwordEncoder.encode(passwordChangeDto.passwordConfirm()));
 
@@ -66,7 +67,7 @@ public class UserServiceImpl implements UserService , VendorService, ClientServi
                 .userId(clientDto.userId())
                 .password(passwordEncoder.encode(clientDto.passwordConfirm()))
                 .build();
-        userRepository.save(client);
+        userRepository.persist(client);
         return "client saved successfully";
     }
 
@@ -78,9 +79,15 @@ public class UserServiceImpl implements UserService , VendorService, ClientServi
                 .userId(vendorDto.vendorName())
                 .phoneNumber(vendorDto.phoneNumber())
                 .password(passwordEncoder.encode(vendorDto.passwordConfirm()))
-                .location(vendorDto.location())
+                .email(vendorDto.email())
                 .build();
-        userRepository.save(vendor);
+        userRepository.persist(vendor);
         return "vendor saved successfully";
     }
+
+    @Override
+    public List<MiniVendorProjection> fetchVendors(String sort) {
+        return userRepository.getVendors();
+    }
+
 }

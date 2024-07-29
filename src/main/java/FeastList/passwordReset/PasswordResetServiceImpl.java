@@ -2,44 +2,48 @@ package FeastList.passwordReset;
 
 import FeastList.mailer.MailProps;
 import FeastList.mailer.MailerService;
-import FeastList.mailer.MailerServiceImpl;
-import FeastList.meals.MealService;
 import FeastList.passwordReset.dto.PasswordResetDto;
 import FeastList.security.AuthenticationService;
 import FeastList.security.exceptions.UserNotFoundException;
 import FeastList.users.PasswordException;
-import FeastList.users.User;
+import FeastList.users.domain.User;
 import FeastList.users.UserRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 @Service
 public class PasswordResetServiceImpl implements PasswordResetService{
 
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
     private final MailerService mailerService;
+
+    private final PasswordEncoder passwordEncoder;
     @Value("${RESET_PASSWORD_CODE_TTL}")
     private  long tokenDuration;
      PasswordResetServiceImpl (PasswordResetRepository passwordResetRepository , UserRepository userRepository,
-                                      MailerService mailerService,AuthenticationService authenticationService)
+                                      MailerService mailerService,PasswordEncoder passwordEncoder)
     {
         this.passwordResetRepository=passwordResetRepository;
         this.userRepository=userRepository;
         this.mailerService=mailerService;
+        this.passwordEncoder=passwordEncoder;
     }
     @Override
     @Transactional
     // still considering this method
     public Map<String, String> confirmResetCode(String resetCode) {
 
-        PasswordReset passwordReset = passwordResetRepository.findByResetCode(resetCode);
+
+        PasswordReset passwordReset =passwordResetRepository
+                .findByPasswordResetCode(resetCode)
+                .orElseThrow(()->new PasswordResetException("invalid Reset Code"));
+
 
         validateResetCode(passwordReset);
 
@@ -54,17 +58,18 @@ public class PasswordResetServiceImpl implements PasswordResetService{
     @Transactional
     public String resetPassword(PasswordResetDto passwordResetDto) {
 
-        PasswordReset passwordReset =passwordResetRepository.findByResetCode(passwordResetDto.resetCode());
+        PasswordReset passwordReset =passwordResetRepository
+                .findByPasswordResetCode(passwordResetDto.resetCode())
+                .orElseThrow(()->new PasswordResetException("invalid Reset Code"));
 
         validateResetCode(passwordReset);
 
-        User user = passwordReset.getUser();
+        User user = userRepository.findById(passwordReset.getUserId())
+                .orElseThrow(()->new PasswordResetException("Associated user does not exist"));
 
-        user.setPassword(passwordResetDto.passwordConfirm());
+        user.changePassword(passwordEncoder.encode(passwordResetDto.passwordConfirm()));
 
-        userRepository.saveUser(user);
-
-        passwordResetRepository.delete(passwordResetDto.resetCode());
+        passwordResetRepository.deleteById(passwordReset.getUserId());
 
         return "password reset success";
 
@@ -75,20 +80,18 @@ public class PasswordResetServiceImpl implements PasswordResetService{
     public String forgetPassword(String email) throws MessagingException {
 
 
-        User user=userRepository.findById(email).orElseThrow(()->new UserNotFoundException(email+ "found"));
+        var secureRandomPasswordResetCode = UUID.randomUUID();
 
-        String passwordResetCode = UUID.randomUUID().toString().substring(0, 6);
-
-        PasswordReset passwordReset=new PasswordReset(passwordResetCode,getTTLMillis(),user);
+        PasswordReset passwordReset=new PasswordReset(email,secureRandomPasswordResetCode,getTTLMillis());
 
         passwordResetRepository.save(passwordReset);
 
         var templateAttributes=new HashMap<String,Object>();
-        templateAttributes.put("userId",user.getUserId());
+        templateAttributes.put("userId",email);
         templateAttributes.put("resetCode",passwordReset.getPasswordResetCode());
         MailProps mailProps=MailProps
                 .builder()
-                .to(user.getUserId())
+                .to(email)
                 .subject("password-reset-template")
                 .templateAttributes(templateAttributes).build();
 
@@ -102,7 +105,7 @@ public class PasswordResetServiceImpl implements PasswordResetService{
     }
     public void validateResetCode(PasswordReset passwordReset) {
         if(!passwordReset.isValid()){
-            passwordResetRepository.delete(passwordReset.getPasswordResetCode());
+            passwordResetRepository.deleteById(passwordReset.getUserId());
             throw new PasswordException("invalid password reset code");
         }
     };

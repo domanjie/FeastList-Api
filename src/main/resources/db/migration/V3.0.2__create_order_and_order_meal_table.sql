@@ -1,0 +1,18 @@
+
+CREATE TABLE orders(
+	id UUID DEFAULT CONCAT(UNHEX(CONV(ROUND(UNIX_TIMESTAMP(CURTIME(4))*1000), 10, 16)), RANDOM_BYTES(10)) PRIMARY KEY,
+	client_id VARCHAR(90) NOT NULL,
+	delivery_location VARCHAR(255),
+	placed_at TIMESTAMP DEFAULT NOW() NOT NULL,
+	CONSTRAINT fk_clients_orders FOREIGN KEY(client_id) REFERENCES  clients(client_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+CREATE TABLE orders_meals(
+	order_id UUID,
+	meal_id UUID,
+	quantity INT NOT NULL,
+	status VARCHAR(20) NOT NULL,
+	delivery_fee DECIMAL(11,2) NOT NULL,
+	primary key(order_id,meal_id),
+	CONSTRAINT fk_orders_orders_meals FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_meals_orders_meals FOREIGN KEY (meal_id) REFERENCES meals(id)  ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;

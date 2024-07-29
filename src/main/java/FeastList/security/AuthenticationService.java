@@ -7,11 +7,12 @@ import java.util.Map;
 
 public interface AuthenticationService {
 
-    Map<String, String> loginPrincipal(LoginRequest loginRequest) throws JOSEException;
+    Map<String, String> loginPrincipal(LoginRequest loginRequest) ;
 
     String revokeTokens(Map<String,String> tokens);
 
-    Map<String, String> refreshTokens(String refreshToken) throws JOSEException;
+    Map<String, String> refreshTokens(String refreshToken) ;
 
-    Authentication getAuthenticatedUser();
+
+    Map<String,String> authenticateOauthUser(String idToken);
 }

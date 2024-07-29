@@ -3,6 +3,7 @@ package FeastList.security.jwt;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,8 @@ public class JwtsTokenServiceImpl implements JwtsTokenService {
 
 
     @Override
-    public  String createToken(Payload payload,String secrete) throws JOSEException {
+    @SneakyThrows
+    public  String createToken(Payload payload,String secrete)  {
 
         JWSSigner  signer=new MACSigner(secrete);
 
@@ -28,7 +30,8 @@ public class JwtsTokenServiceImpl implements JwtsTokenService {
     }
 
     @Override
-    public Optional<Map<String, Object>> verifyToken(String token,String secrete) throws ParseException, JOSEException {
+    @SneakyThrows
+    public Optional<Map<String, Object>> verifyToken(String token,String secrete)  {
 
         JWSVerifier verifier=new MACVerifier(secrete);
 

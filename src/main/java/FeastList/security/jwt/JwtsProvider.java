@@ -35,11 +35,7 @@ public class JwtsProvider implements AuthenticationProvider {
         String secret=getSecret(unAuthenticated.getTokenType());
 
         Optional<Map<String,Object>> optionalTokenPayload;
-        try {
-            optionalTokenPayload= jwtsTokenService.verifyToken(token,secret);
-        } catch (ParseException | JOSEException e) {;
-            throw new RuntimeException(e);
-        }
+        optionalTokenPayload= jwtsTokenService.verifyToken(token,secret);
         return  optionalTokenPayload.map(payload->
                 new JwtsTokenAuthentication((String) payload.get("username"),
                         (String)payload.get("role"),

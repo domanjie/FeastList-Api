@@ -1,17 +1,12 @@
 package FeastList.orders;
 
-import java.util.List;
-import java.util.Optional;
+import FeastList.orders.domain.Order;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface OrderRepository {
+import java.util.UUID;
 
-    List<Order> getOrdersByClientId(String clientId);
+@Repository
+public interface OrderRepository extends CrudRepository<Order, UUID> {
 
-    Optional<Order> getOrderById(Long orderId);
-
-    int saveOrder(Order order);
-
-    List<Order> getOrdersByVendorId(String vendorId);
-
-    Order updateOrder(Order order);
 }

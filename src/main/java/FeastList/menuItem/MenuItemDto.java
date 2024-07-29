@@ -1,2 +1,3 @@
-package FeastList.menuItem;public record MenuItemDto() {
+package FeastList.menuItem;
+public record MenuItemDto() {
 }
