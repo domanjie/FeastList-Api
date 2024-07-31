@@ -2,14 +2,17 @@ package FeastList.tray;
 
 import FeastList.meal.domain.Meal;
 import FeastList.meal.repository.JpaMealRepository;
-import FeastList.security.AuthenticationService;
+import FeastList.tray.dto.TrayItemNotFoundException;
+import FeastList.tray.dto.in.TrayItemQuantityDto;
+import FeastList.tray.dto.out.TrayItemDtoOut;
+import FeastList.tray.dto.in.TrayItemDtoIn;
+import FeastList.tray.dto.out.VendorTrayItemsDto;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TrayServiceImpl implements TrayService {
@@ -30,15 +33,13 @@ public class TrayServiceImpl implements TrayService {
 
     @Override
     @Transactional
-    public String addToTray(TrayItemDto trayItemDto) {
+    public String addToTray(TrayItemDtoIn trayItemDtoIn) {
         var client =SecurityContextHolder .getContext().getAuthentication().getName();
-        var trayItem= buildTrayItem(trayItemDto,client);
-        trayRepo.save(trayItem);
+        var trayItem= buildTrayItem(trayItemDtoIn,client);
+        trayRepo.persist(trayItem);
         return "meal added successfully";
 
     }
-
-
 
     @Override
     @Transactional
@@ -50,26 +51,56 @@ public class TrayServiceImpl implements TrayService {
     }
 
     @Override
-    public List<TrayDto> getClientTray() {
-       var trayItems= trayRepo.findTrayItemsByClientId(SecurityContextHolder.getContext().getAuthentication().getName());
-       var mealKey=trayItems.stream().map(trayItem -> trayItem.getTrayItemId().getMealId()).toList();
-       List<Meal> meals= (List<Meal>) mealRepository.findAllById(mealKey);
-       System.out.println(meals);
-       System.out.println(trayItems);
-       var tray=new ArrayList<TrayDto>();
+    public List<VendorTrayItemsDto> getClientTray() {
+        var clientId=SecurityContextHolder.getContext().getAuthentication().getName();
+        var trayItems= trayRepo.findByTrayItemIdClientIdOrderByAddedAtAsc(clientId);
+        var mealKeys=trayItems.stream().map(trayItem ->trayItem.getTrayItemId().getMealId()).toList();
+        var mealKeysString=mealKeys.stream().map(Object::toString).collect(Collectors.joining(","));
+        List<Meal> meals= mealRepository.findAllByIdOrderByIdList(mealKeys,mealKeysString);
+        var list=new ArrayList<TrayItemDtoOut>();
         for (int i = 0; i <trayItems.size(); i++) {
-            tray.add(new TrayDto(meals.get(i),trayItems.get(i).getAmount()));
+            list.add(new TrayItemDtoOut(meals.get(i),trayItems.get(i).getAmount()));
         }
-       return tray;
+        return groupTraysItemsByVendor(list);
     }
 
-    private TrayItem buildTrayItem(TrayItemDto trayItemDto, String client) {
+    private List<VendorTrayItemsDto> groupTraysItemsByVendor(ArrayList<TrayItemDtoOut> list) {
+
+        var map=new LinkedHashMap<String,ArrayList<TrayItemDtoOut>>();
+
+        for(TrayItemDtoOut item:list){
+            var key=item.meal().getVendorName();
+            if(map.containsKey(key))
+                map.get(key).add(item);
+            else{
+                map.put(key,new ArrayList<TrayItemDtoOut>(Collections.singleton(item)));
+            }
+        }
+        var tray=new ArrayList<VendorTrayItemsDto>();
+        map.forEach((key, value) -> tray.add(new VendorTrayItemsDto(key, value)));
+        return tray;
+    }
+
+    @Transactional
+    @Override
+    public void changeTrayItemQuantity(UUID mealId, TrayItemQuantityDto trayItemQuantityDto) {
+        var client=SecurityContextHolder.getContext().getAuthentication().getName();
+        var id =new TrayItem.TrayItemId(client,mealId);
+        var trayITem=trayRepo.findById(id).orElseThrow(()->new TrayItemNotFoundException(""));
+        if(trayItemQuantityDto.quantity()==0){
+            trayRepo.deleteById(id);
+            return ;
+        }
+        trayITem.changeAmount(trayItemQuantityDto.quantity());
+    }
+
+    private TrayItem buildTrayItem(TrayItemDtoIn trayItemDtoIn, String client) {
         return TrayItem
                 .builder()
                 .trayItemId(new TrayItem.TrayItemId(
                         client,
-                        UUID.fromString(trayItemDto.mealId())))
-                .amount(trayItemDto.amount())
+                        UUID.fromString(trayItemDtoIn.mealId())))
+                .amount(trayItemDtoIn.amount())
                 .build();
     }
 }

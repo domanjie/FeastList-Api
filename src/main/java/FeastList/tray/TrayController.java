@@ -1,8 +1,9 @@
 package FeastList.tray;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import FeastList.tray.dto.in.TrayItemQuantityDto;
+import FeastList.tray.dto.in.TrayItemDtoIn;
+import FeastList.tray.dto.out.VendorTrayItemsDto;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -14,20 +15,27 @@ public class TrayController {
     public TrayController(TrayService trayService) {
         this.trayService=trayService;
     }
+
     @DeleteMapping
     public String clearTray(){
       return  trayService.clearTray();
     }
+
     @PostMapping
-    public String addToTray(@RequestBody TrayItemDto trayItemDto) {
-        return trayService.addToTray(trayItemDto);
+    public String addToTray(@RequestBody TrayItemDtoIn trayItemDtoIn) {
+        return trayService.addToTray(trayItemDtoIn);
     }
+
+    @PatchMapping(path = "/{itemId}")
+    public void alterTrayItemItemQuantity(@PathVariable("itemId") String itemId, @RequestBody TrayItemQuantityDto trayItemQuantityDto){
+         trayService.changeTrayItemQuantity(UUID.fromString(itemId), trayItemQuantityDto);
+    };
     @DeleteMapping(path = "/{id}")
     public void deleteFromTray(@PathVariable("id") String  mealId){
         trayService.deleteFromTray(UUID.fromString(mealId));
     }
     @GetMapping
-    public List<TrayDto> getTray(){
+    public List<VendorTrayItemsDto> getTray(){
         return trayService.getClientTray();
     }
 }

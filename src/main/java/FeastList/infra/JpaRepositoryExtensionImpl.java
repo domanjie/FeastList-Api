@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class JpaRepositoryExtensionImpl<T> implements JpaRepositoryExtension<T> {
+
     private final EntityManager entityManager;
     public JpaRepositoryExtensionImpl(EntityManager entityManager ){
         this.entityManager=entityManager;

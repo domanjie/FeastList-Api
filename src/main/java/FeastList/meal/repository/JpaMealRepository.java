@@ -29,10 +29,10 @@ public interface JpaMealRepository extends CrudRepository<Meal, UUID>, JpaReposi
             """ ,nativeQuery = true)
     List<PreMadeMealProjection> findAllPreMadeMeal(@Param("client") String client);
 
+    @Query(value ="""
+            select meal from Meal meal where meal.id in :ids
+                   order by FIND_IN_SET(meal.id, :idStr)
+            """)
+    List<Meal> findAllByIdOrderByIdList(@Param("ids")List<UUID> ids ,@Param("idStr")String idStr);
 
-//    @Query(value = """
-//
-//
-//            """)
-//    List<Meal> findAllByIdOrderByIdList(Set<UUID> uuids);
 }
