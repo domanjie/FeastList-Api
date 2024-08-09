@@ -1,6 +1,10 @@
 package FeastList.tray.dto.out;
 
+import lombok.Builder;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public record VendorTrayItemsDto(String vendorName, List<TrayItemDtoOut> TrayItems) {
+@Builder
+public record VendorTrayItemsDto(String vendorName, String vendorAvatar , ArrayList<TrayItemDtoOut> trayItems) {
 }

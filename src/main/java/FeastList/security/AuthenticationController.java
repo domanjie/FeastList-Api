@@ -42,8 +42,8 @@ public class AuthenticationController {
     }
 
     @GetMapping("/oauth-login")
-    public void   authenticateOauthUser(@RequestParam(value = "id_token",required = true)String id_token){
-        authenticationService.authenticateOauthUser(id_token);
+    public String  authenticateOauthUser(@RequestParam(value = "id_token",required = true)String id_token,HttpServletResponse response){
+        return newTokens(response,authenticationService.authenticateOauthUser(id_token));
     }
 
     @PostMapping("/logout")

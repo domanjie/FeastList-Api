@@ -1,27 +1,20 @@
 package FeastList.tray;
-
-import FeastList.meal.domain.Meal;
-import FeastList.meal.repository.JpaMealRepository;
 import FeastList.tray.dto.TrayItemNotFoundException;
 import FeastList.tray.dto.in.TrayItemQuantityDto;
-import FeastList.tray.dto.out.TrayItemDtoOut;
 import FeastList.tray.dto.in.TrayItemDtoIn;
 import FeastList.tray.dto.out.VendorTrayItemsDto;
+import FeastList.tray.repository.TrayRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class TrayServiceImpl implements TrayService {
     private final TrayRepository trayRepo;
-    private final JpaMealRepository mealRepository;
-    public TrayServiceImpl(TrayRepository trayRepository,
-                           JpaMealRepository mealRepository){
+    public TrayServiceImpl(TrayRepository trayRepository){
         this.trayRepo=trayRepository;
-        this.mealRepository=mealRepository;
     }
     @Override
     @Transactional
@@ -34,8 +27,14 @@ public class TrayServiceImpl implements TrayService {
     @Override
     @Transactional
     public String addToTray(TrayItemDtoIn trayItemDtoIn) {
-        var client =SecurityContextHolder .getContext().getAuthentication().getName();
-        var trayItem= buildTrayItem(trayItemDtoIn,client);
+        var clientId =SecurityContextHolder .getContext().getAuthentication().getName();
+        var mealId =UUID.fromString(trayItemDtoIn.mealId());
+        var trayItem= TrayItem
+                .builder()
+                .trayItemId(new TrayItem.TrayItemId(clientId,mealId))
+                .amount(trayItemDtoIn.amount())
+                .build();
+
         trayRepo.persist(trayItem);
         return "meal added successfully";
 
@@ -52,34 +51,10 @@ public class TrayServiceImpl implements TrayService {
 
     @Override
     public List<VendorTrayItemsDto> getClientTray() {
-        var clientId=SecurityContextHolder.getContext().getAuthentication().getName();
-        var trayItems= trayRepo.findByTrayItemIdClientIdOrderByAddedAtAsc(clientId);
-        var mealKeys=trayItems.stream().map(trayItem ->trayItem.getTrayItemId().getMealId()).toList();
-        var mealKeysString=mealKeys.stream().map(Object::toString).collect(Collectors.joining(","));
-        List<Meal> meals= mealRepository.findAllByIdOrderByIdList(mealKeys,mealKeysString);
-        var list=new ArrayList<TrayItemDtoOut>();
-        for (int i = 0; i <trayItems.size(); i++) {
-            list.add(new TrayItemDtoOut(meals.get(i),trayItems.get(i).getAmount()));
-        }
-        return groupTraysItemsByVendor(list);
+        var clientId =SecurityContextHolder.getContext().getAuthentication().getName();
+        return trayRepo.getClientTray(clientId);
     }
 
-    private List<VendorTrayItemsDto> groupTraysItemsByVendor(ArrayList<TrayItemDtoOut> list) {
-
-        var map=new LinkedHashMap<String,ArrayList<TrayItemDtoOut>>();
-
-        for(TrayItemDtoOut item:list){
-            var key=item.meal().getVendorName();
-            if(map.containsKey(key))
-                map.get(key).add(item);
-            else{
-                map.put(key,new ArrayList<TrayItemDtoOut>(Collections.singleton(item)));
-            }
-        }
-        var tray=new ArrayList<VendorTrayItemsDto>();
-        map.forEach((key, value) -> tray.add(new VendorTrayItemsDto(key, value)));
-        return tray;
-    }
 
     @Transactional
     @Override
@@ -92,15 +67,5 @@ public class TrayServiceImpl implements TrayService {
             return ;
         }
         trayITem.changeAmount(trayItemQuantityDto.quantity());
-    }
-
-    private TrayItem buildTrayItem(TrayItemDtoIn trayItemDtoIn, String client) {
-        return TrayItem
-                .builder()
-                .trayItemId(new TrayItem.TrayItemId(
-                        client,
-                        UUID.fromString(trayItemDtoIn.mealId())))
-                .amount(trayItemDtoIn.amount())
-                .build();
     }
 }

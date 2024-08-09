@@ -1,6 +1,10 @@
 package FeastList.tray.dto.out;
 
-import FeastList.meal.domain.Meal;
+import lombok.Builder;
 
-public record TrayItemDtoOut(Meal meal, int amount)  {
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Builder
+public record TrayItemDtoOut(UUID itemId , String mealName, String mealAvatar, BigDecimal price, int amount)  {
 }

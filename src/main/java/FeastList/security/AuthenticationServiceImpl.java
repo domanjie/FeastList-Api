@@ -45,23 +45,24 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     @Value("${ACCESS_TOKEN_SECRET}")
     private   String ACCESS_TOKEN_SECRET;
 
-    @Value("${CLIENT_ID}")
-    private String CLIENT_ID;
-
     private final UserRepository userRepository;
 
     private final JwtsTokenService jwtsTokenService;
     private final AuthenticationManager authenticationManager;
 
 
-    private final GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-            .setAudience(Collections.singletonList(CLIENT_ID))
-            .build();
+    private final GoogleIdTokenVerifier verifier ;
 
-    public AuthenticationServiceImpl( AuthenticationManager authenticationManager, JwtsTokenService jwtsTokenService,UserRepository userRepository){
+    public AuthenticationServiceImpl( AuthenticationManager authenticationManager,
+                                      JwtsTokenService jwtsTokenService,
+                                      UserRepository userRepository,
+                                      @Value("${CLIENT_ID}")final String CLIENT_ID){
         this.userRepository = userRepository;
         this.authenticationManager=authenticationManager;
         this.jwtsTokenService = jwtsTokenService;
+        this.verifier= new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList(CLIENT_ID))
+                .build();
     }
 
     @Override
@@ -99,7 +100,6 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     @Override
     @SneakyThrows
     public Map<String, String> authenticateOauthUser(String idTokenString) {
-
         GoogleIdToken idToken = verifier.verify(idTokenString);
         if (idToken == null)
             throw new AccessDeniedException("INVALID_ID_TOKEN");
