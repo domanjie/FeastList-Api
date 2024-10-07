@@ -76,10 +76,10 @@ public class UserServiceImpl implements UserService , VendorService, ClientServi
     public String addNewVendor(VendorDto vendorDto) {
         var vendor= Vendor
                 .builder()
-                .userId(vendorDto.vendorName())
+                .userId(vendorDto.userId())
                 .phoneNumber(vendorDto.phoneNumber())
                 .password(passwordEncoder.encode(vendorDto.passwordConfirm()))
-                .email(vendorDto.email())
+                .vendorUsername(vendorDto.vendorUsername()  )
                 .build();
         userRepository.persist(vendor);
         return "vendor saved successfully";

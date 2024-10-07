@@ -22,7 +22,7 @@ public class TrayRepoExtensionImpl implements TrayRepoExtension {
     @Override
     public List<VendorTrayItemsDto> getClientTray(String clientId) {
        var query="""
-        SELECT u.avatar_url,v.vendor_name,pmm.id,pmm.meal_name,pmm.price,pmm.avatar_url,t.amount FROM
+        SELECT u.avatar_url,v.vendor_username as vendor_name,pmm.id,pmm.meal_name,pmm.price,pmm.avatar_url,t.amount FROM
         tray t
         LEFT JOIN
         pre_made_meal pmm
@@ -31,11 +31,11 @@ public class TrayRepoExtensionImpl implements TrayRepoExtension {
         ON pmm.id=m.id
         LEFT JOIN
         vendors v
-        ON m.vendor_name=v.vendor_name
+        ON m.vendor_name=v.vendor_id
         LEFT JOIN users u
-        ON v.vendor_name=u.user_id
+        ON v.vendor_id=u.user_id
         WHERE  t.client_id =:clientId
-        ORDER BY t.added_at , v.vendor_name;
+        ORDER BY t.added_at , v.vendor_id;
         """;
        List<Object[]> resultSet= entityManager.createNativeQuery(query).setParameter("clientId",clientId).getResultList();
 

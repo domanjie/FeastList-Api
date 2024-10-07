@@ -1,10 +1,11 @@
 package FeastList.orders.dto.in;
 
-import FeastList.orders.domain.OrderItemDetails;
 import FeastList.payment.CreditCardPaymentDetails;
 
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.util.List;
 
-public record OrderDto(LinkedHashMap<UUID, OrderItemDetails> orderItems, String Location, CreditCardPaymentDetails creditCardPaymentDetails)  {
+public record OrderDto(String deliveryLocation, List<OrderGroupDto> orderGroupDtos, CreditCardPaymentDetails creditCardPaymentDetails)  {
+
+
+
 }

@@ -19,11 +19,13 @@ public interface UserRepository extends CrudRepository<User,String>, JpaReposito
     Optional<User> findById(String s);
 
     @Query(value = """
-            SELECT vendor_name, header_photo
-            FROM vendors v
-            INNER JOIN users u
-            ON u.user_id =v.vendor_name ;
+            SELECT vendor_username as vendor_name, header_photo
+            FROM vendors
             """,nativeQuery = true)
     List<MiniVendorProjection> getVendors();
 
+    //
+    default String   getVendorLocation(String s){
+        return "";
+    };
 }

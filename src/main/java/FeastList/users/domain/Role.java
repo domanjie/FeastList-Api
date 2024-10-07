@@ -1,8 +1,8 @@
 package FeastList.users.domain;
 
 public enum Role {
-    RUNNER,
+    COURIER,
     VENDOR,
     CLIENT,
-    ADMIN
+    ADMIN,
 }

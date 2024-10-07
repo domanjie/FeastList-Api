@@ -15,12 +15,12 @@ import java.util.Collections;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@PrimaryKeyJoinColumn(name = "vendor_name")
+@PrimaryKeyJoinColumn(name = "vendor_id")
 @Table(name ="vendors")
 @NoArgsConstructor(force = true)
 public class Vendor extends User{
-    @Column(name = "email")
-    private final String email;
+    @Column(name = "vendor_username")
+    private final String username;
 
     @Column(name= "header_photo")
     private final String headerPhoto;
@@ -33,9 +33,9 @@ public class Vendor extends User{
     private final Role role =Role.VENDOR;
     @Builder
     public Vendor(String userId, String password, Timestamp dateJoined, String phoneNumber, boolean isEnabled,
-                  String avatarUrl, String email,String header_photo,String location) {
+                  String avatarUrl, String vendorUsername,String header_photo,String location) {
         super(userId, password, phoneNumber,  isEnabled, avatarUrl,dateJoined);
-        this.email=email;
+        this.username=vendorUsername;
         this.headerPhoto=header_photo;
         this.location=location;
     }

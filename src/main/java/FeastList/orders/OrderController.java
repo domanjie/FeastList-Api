@@ -4,9 +4,9 @@ import java.util.List;
 
 import FeastList.orders.domain.Order;
 import FeastList.orders.dto.in.OrderDto;
+import FeastList.orders.repository.OrderRepository;
 import FeastList.orders.service.OrderService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,11 +19,19 @@ public class OrderController {
 
 	private final OrderService orderService;
 	
-	public OrderController(OrderService orderService) {
+	private final OrderRepository orderRepository;
+	public OrderController(OrderService orderService,OrderRepository orderRepository) {
 		this.orderService=orderService;
+		this.orderRepository=orderRepository;
+
 	}
 	@PostMapping
 	public String saveUserOrder(@RequestBody OrderDto order){
 		return orderService.processNewOrder(order);
 	}
+	@GetMapping
+	public List<FeastList.orders.dto.out.OrderDto> getOrders(){
+        return orderRepository.getClientOrders(SecurityContextHolder.getContext().getAuthentication().getName());
+	}
+
 }

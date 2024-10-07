@@ -2,10 +2,13 @@ package FeastList.delivery;
 
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class DeliveryServiceImpl implements  DeliveryService {
-    @Override
-    public void determineDeliveryCost() {
 
+    @Override
+    public double determineDeliveryCost(Object ClientLocation, Object VendorLocation) {
+        return 0;
     }
 }

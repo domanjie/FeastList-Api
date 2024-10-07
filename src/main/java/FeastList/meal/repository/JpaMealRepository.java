@@ -17,11 +17,13 @@ import java.util.UUID;
 public interface JpaMealRepository extends CrudRepository<Meal, UUID>, JpaRepositoryExtension<Meal> {
 
     @Query(value = """
-            SELECT  m.id, m.vendor_name,p.meal_name, p.avatar_url, p.price,IF(client_id =:client, TRUE,FALSE) as is_in_cart
+            SELECT  m.id, m.vendor_name,u.avatar_url as vendor_avatar_url ,p.meal_name,  p.avatar_url, p.price,IF(client_id =:client, TRUE,FALSE) as is_in_cart
             FROM meals as m
             INNER JOIN
             pre_made_meal as p
             ON m.id=p.id
+            LEFT JOIN users u
+            ON m.vendor_name =u.user_id
             LEFT JOIN
             tray t
             ON 	p.id =t.meal_id
@@ -31,8 +33,7 @@ public interface JpaMealRepository extends CrudRepository<Meal, UUID>, JpaReposi
 
     @Query(value ="""
             select meal from Meal meal where meal.id in :ids
-                   order by FIND_IN_SET(meal.id, :idStr)
             """)
-    List<Meal> findAllByIdOrderByIdList(@Param("ids")List<UUID> ids ,@Param("idStr")String idStr);
+    List<Meal> findAllById(@Param("ids")List<UUID> ids);
 
 }

@@ -9,5 +9,6 @@ public interface PreMadeMealProjection{
     String getMeal_name();
     String getAvatar_url();
     double getPrice();
+    String getVendor_avatar_url();
     int getIs_in_cart();
 }
